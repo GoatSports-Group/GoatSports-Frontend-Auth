@@ -1,0 +1,110 @@
+<div class="auth-card-container">
+  <mat-card class="mat-elevation-z4 auth-card">
+    <mat-card-header class="auth-card-header">
+      <a href="http://localhost:4200" class="header-logo">
+        <img src="assets/logos/goat.png" alt="Goat Sports Logo" class="logo-img">
+        <h2 class="logo-title">GOAT<span class="logo-accent">Sports</span></h2>
+      </a>
+      <mat-card-title class="auth-title">Đăng Ký Tài Khoản</mat-card-title>
+      <mat-card-subtitle class="auth-subtitle">Tạo tài khoản để bắt đầu trải nghiệm</mat-card-subtitle>
+    </mat-card-header>
+
+    <mat-card-content class="auth-card-content">
+      <form [formGroup]="signUpForm" (ngSubmit)="register()" class="auth-form">
+
+        <div class="form-row">
+          <!-- Full Name Field -->
+          <mat-form-field appearance="outline" class="form-field-half">
+            <mat-label>Họ và Tên</mat-label>
+            <input matInput type="text" formControlName="fullName" placeholder="Nhập họ và tên của bạn" required>
+            <mat-icon matPrefix color="primary">badge</mat-icon>
+            @if (signUpForm.get('fullName')?.hasError('required')) {
+            <mat-error>Họ tên không được để trống</mat-error>
+            }
+          </mat-form-field>
+
+          <!-- Username Field -->
+          <mat-form-field appearance="outline" class="form-field-half">
+            <mat-label>Tên đăng nhập</mat-label>
+            <input matInput type="text" formControlName="username" placeholder="Nhập username mong muốn" required>
+            <mat-icon matPrefix color="primary">person</mat-icon>
+            @if (signUpForm.get('username')?.hasError('required')) {
+            <mat-error>Tên đăng nhập không được để trống</mat-error>
+            }
+            @if (signUpForm.get('username')?.hasError('minlength')) {
+            <mat-error>Tên đăng nhập phải chứa ít nhất 3 ký tự</mat-error>
+            }
+          </mat-form-field>
+        </div>
+
+        <!-- Email Field -->
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Email</mat-label>
+          <input matInput type="email" formControlName="email" placeholder="example@gmail.com" required>
+          <mat-icon matPrefix color="primary">email</mat-icon>
+          @if (signUpForm.get('email')?.hasError('required')) {
+          <mat-error>Email không được để trống</mat-error>
+          }
+          @if (signUpForm.get('email')?.hasError('email')) {
+          <mat-error>Email không đúng định dạng</mat-error>
+          }
+        </mat-form-field>
+
+        <div class="form-row">
+          <!-- Password Field -->
+          <mat-form-field appearance="outline" class="form-field-half">
+            <mat-label>Mật khẩu</mat-label>
+            <input matInput [type]="hidePassword ? 'password' : 'text'" formControlName="password"
+              placeholder="••••••••" required>
+            <mat-icon matPrefix color="primary">lock</mat-icon>
+            <button mat-icon-button matSuffix (click)="hidePassword = !hidePassword" type="button"
+              aria-label="Toggle password visibility">
+              <mat-icon>{{ hidePassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+            </button>
+            @if (signUpForm.get('password')?.hasError('required')) {
+            <mat-error>Mật khẩu không được để trống</mat-error>
+            }
+            @if (signUpForm.get('password')?.hasError('pattern')) {
+            <mat-error>Mật khẩu phải có ít nhất 8 ký tự, chữ hoa, chữ thường, số và ký tự đặc biệt</mat-error>
+            }
+          </mat-form-field>
+
+          <!-- Confirm Password Field -->
+          <mat-form-field appearance="outline" class="form-field-half">
+            <mat-label>Xác nhận mật khẩu</mat-label>
+            <input matInput [type]="hideConfirmPassword ? 'password' : 'text'" formControlName="confirmPassword"
+              placeholder="••••••••" required>
+            <mat-icon matPrefix color="primary">lock_reset</mat-icon>
+            <button mat-icon-button matSuffix (click)="hideConfirmPassword = !hideConfirmPassword" type="button"
+              aria-label="Toggle password visibility">
+              <mat-icon>{{ hideConfirmPassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+            </button>
+            @if (signUpForm.get('confirmPassword')?.hasError('required')) {
+            <mat-error>Mật khẩu xác nhận không được để trống</mat-error>
+            }
+            @if (signUpForm.get('confirmPassword')?.hasError('passwordMismatch') && signUpForm.get('confirmPassword')?.touched) {
+            <mat-error>Mật khẩu xác nhận không trùng khớp</mat-error>
+            }
+          </mat-form-field>
+        </div>
+
+        <!-- Action Button -->
+        <button mat-flat-button color="primary" type="submit" [disabled]="signUpForm.invalid || loading"
+          class="full-width submit-btn">
+          @if (loading) {
+          <span class="btn-loading-text">Đang tạo tài khoản...</span>
+          } @else {
+          <span>Đăng Ký</span>
+          }
+        </button>
+
+      </form>
+    </mat-card-content>
+
+    <mat-card-footer class="auth-card-footer">
+      <p class="footer-link-text">
+        Đã có tài khoản? <a (click)="navigateToSignIn()" class="auth-link">Đăng nhập</a>
+      </p>
+    </mat-card-footer>
+  </mat-card>
+</div>

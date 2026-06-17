@@ -1,0 +1,127 @@
+.auth-layout {
+  width: 100vw;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #f7fafc;
+  padding: 0;
+  overflow-x: hidden;
+}
+
+.auth-split-wrapper {
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+  width: 100%;
+  min-height: 100vh;
+  background-color: #ffffff;
+
+  @media (max-width: 992px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+// Left side banner
+.auth-banner-side {
+  position: relative;
+  background: linear-gradient(rgba(46, 125, 50, 0.85), rgba(27, 94, 32, 0.9)), url('/assets/images/background.jpg');
+  background-size: cover;
+  background-position: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem;
+  color: #ffffff;
+
+  @media (max-width: 992px) {
+    display: none; // Hide on mobile to focus on inputs
+  }
+
+  .banner-content {
+    max-width: 500px;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .brand-logo {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    cursor: pointer;
+    text-decoration: none;
+
+    .brand-img {
+      height: 90px;
+      width: auto;
+      object-fit: contain;
+      filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.1));
+    }
+
+    .brand-name {
+      font-family: var(--font-heading, 'Outfit', sans-serif);
+      font-weight: 900;
+      font-size: 1.8rem;
+      color: #ffffff;
+      letter-spacing: -0.5px;
+
+      .brand-accent {
+        color: var(--accent, #ef6c00);
+      }
+    }
+  }
+
+  .banner-title {
+    font-size: 2.6rem;
+    font-weight: 850;
+    line-height: 1.2;
+    color: #ffffff;
+    margin: 0;
+  }
+
+  .banner-text {
+    font-size: 1.05rem;
+    line-height: 1.6;
+    color: rgba(255, 255, 255, 0.9);
+    margin: 0;
+  }
+
+  .banner-badges {
+    display: flex;
+    gap: 1.5rem;
+    margin-top: 1rem;
+
+    .badge-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.85rem;
+      font-weight: 700;
+      background-color: rgba(255, 255, 255, 0.1);
+      padding: 0.5rem 1.25rem;
+      border-radius: 99px;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+
+      mat-icon {
+        font-size: 18px;
+        width: 18px;
+        height: 18px;
+      }
+    }
+  }
+}
+
+// Right side form
+.auth-form-side {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 2rem;
+  background-color: #ffffff;
+
+  @media (max-width: 576px) {
+    padding: 1.5rem 1rem;
+    background-color: var(--bg-body, #f7fafc); // soft gray on mobile
+  }
+}
