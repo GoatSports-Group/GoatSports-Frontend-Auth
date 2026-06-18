@@ -1,0 +1,153 @@
+import { Injectable, inject } from '@angular/core';
+import { Observable, tap } from 'rxjs';
+import { Router } from '@angular/router';
+import { BaseResponse } from '../../domain/entities/base';
+import { User, LoginRequest, RegisterRequest, VerificationRequest, ForgotPasswordRequest } from '../../domain/entities/user';
+import { SessionStateService } from '../../domain/models/session-state.service';
+import { LoginUseCase } from '../../application/auth/login.usecase';
+import { LoginKeycloakUseCase } from '../../application/auth/login-keycloak.usecase';
+import { RegisterUseCase } from '../../application/auth/register.usecase';
+import { VerifyUseCase } from '../../application/auth/verify.usecase';
+import { ForgotPasswordUseCase } from '../../application/auth/forgot-password.usecase';
+import { ResendVerificationUseCase } from '../../application/auth/resend-verification.usecase';
+import { LogoutUseCase } from '../../application/auth/logout.usecase';
+import { RefreshTokenUseCase } from '../../application/auth/refresh-token.usecase';
+import { GetCurrentUserUseCase } from '../../application/auth/get-current-user.usecase';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class AuthService {
+  private sessionStateService = inject(SessionStateService);
+  private router = inject(Router);
+
+  private loginUseCase = inject(LoginUseCase);
+  private loginKeycloakUseCase = inject(LoginKeycloakUseCase);
+  private registerUseCase = inject(RegisterUseCase);
+  private verifyUseCase = inject(VerifyUseCase);
+  private forgotPasswordUseCase = inject(ForgotPasswordUseCase);
+  private resendVerificationUseCase = inject(ResendVerificationUseCase);
+  private logoutUseCase = inject(LogoutUseCase);
+  private refreshTokenUseCase = inject(RefreshTokenUseCase);
+  private getCurrentUserUseCase = inject(GetCurrentUserUseCase);
+
+  private isLoggingOut = false;
+
+  public currentUser$ = this.sessionStateService.currentUser$;
+  public isAuthenticated$ = this.sessionStateService.isAuthenticated$;
+  public sessionReady$ = this.sessionStateService.sessionReady$;
+
+  constructor() {
+    this.loadSession();
+  }
+
+  login(payload: LoginRequest): Observable<BaseResponse<User>> {
+    return this.loginUseCase.execute(payload).pipe(
+      tap(response => {
+        const userProfile = response?.data;
+        this.sessionStateService.setCurrentUser(userProfile || null);
+      })
+    );
+  }
+
+  loginWithKeycloak(payload: { code: string; redirectUri: string }): Observable<BaseResponse<User>> {
+    return this.loginKeycloakUseCase.execute(payload).pipe(
+      tap(response => {
+        const userProfile = response?.data;
+        this.sessionStateService.setCurrentUser(userProfile || null);
+      })
+    );
+  }
+
+  register(payload: RegisterRequest): Observable<BaseResponse<User>> {
+    return this.registerUseCase.execute(payload);
+  }
+
+  verify(payload: VerificationRequest): Observable<BaseResponse<void>> {
+    return this.verifyUseCase.execute(payload);
+  }
+
+  forgotPassword(payload: ForgotPasswordRequest): Observable<any> {
+    return this.forgotPasswordUseCase.execute(payload);
+  }
+
+  resendVerificationCode(email: string): Observable<any> {
+    return this.resendVerificationUseCase.execute(email);
+  }
+
+  logout(): Observable<BaseResponse<void>> {
+    return this.logoutUseCase.execute().pipe(
+      tap({
+        next: () => this.performLogout(),
+        error: () => this.performLogout()
+      })
+    );
+  }
+
+  refresh(): Observable<BaseResponse<User>> {
+    return this.refreshTokenUseCase.execute().pipe(
+      tap({
+        next: response => {
+          const userProfile = response?.data;
+          this.sessionStateService.setCurrentUser(userProfile || null);
+        },
+        error: () => {}
+      })
+    );
+  }
+
+  getCurrentUser(): Observable<BaseResponse<User>> {
+    return this.getCurrentUserUseCase.execute().pipe(
+      tap({
+        next: response => {
+          const userProfile = response?.data;
+          this.sessionStateService.setCurrentUser(userProfile || null);
+        },
+        error: () => {
+          this.clearSession();
+        }
+      })
+    );
+  }
+
+  public get currentUser(): User | null {
+    return this.sessionStateService.getCurrentUser();
+  }
+
+  public get isAuthenticated(): boolean {
+    return this.sessionStateService.getIsAuthenticated();
+  }
+
+  public performLogout() {
+    if (this.isLoggingOut) {
+      console.log('Already logging out...');
+      return;
+    }
+
+    this.isLoggingOut = true;
+    console.log('Performing logout...');
+    this.clearSession();
+
+    this.router.navigate(['/']).then(() => {
+      setTimeout(() => {
+        this.isLoggingOut = false;
+      }, 1000);
+    });
+  }
+
+  private loadSession() {
+    this.refresh().subscribe({
+      next: () => {
+        this.sessionStateService.setSessionReady(true);
+      },
+      error: () => {
+        this.clearSession();
+        this.sessionStateService.setSessionReady(true);
+      }
+    });
+  }
+
+  private clearSession() {
+    this.sessionStateService.clearSession();
+  }
+}
