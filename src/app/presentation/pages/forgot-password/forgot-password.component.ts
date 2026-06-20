@@ -2,8 +2,8 @@ import { Component, inject } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { AuthService } from '../../services/auth.service';
 import { HttpErrorResponse } from '@angular/common/http';
+import { AuthService } from '@presentation/services/auth.service';
 
 @Component({
   selector: 'app-forgot-password',
@@ -73,7 +73,6 @@ export class ForgotPasswordComponent {
           panelClass: ['snackbar-success']
         });
 
-        // Redirect directly to verify page with email query parameter
         setTimeout(() => {
           this.router.navigate(['/verify'], { queryParams: { email: email }, queryParamsHandling: 'merge' });
         }, 1500);

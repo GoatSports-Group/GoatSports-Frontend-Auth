@@ -7,8 +7,8 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { AuthModule } from './presentation/auth.module';
 
-import { AUTH_REPOSITORY_TOKEN } from './domain/repositories/tokens';
-import { AuthRepositoryImpl } from './infrastructure/repositories/auth.repository.impl';
+import { AUTH_REPOSITORY_TOKEN } from '@application/ports/auth.repository';
+import { AuthRepositoryImpl } from '@infrastructure/repositories/auth.repository.impl';
 
 @NgModule({
   declarations: [

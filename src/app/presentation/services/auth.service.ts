@@ -1,18 +1,19 @@
 import { Injectable, inject } from '@angular/core';
 import { Observable, tap } from 'rxjs';
 import { Router } from '@angular/router';
-import { BaseResponse } from '../../domain/entities/base';
-import { User, LoginRequest, RegisterRequest, VerificationRequest, ForgotPasswordRequest } from '../../domain/entities/user';
-import { SessionStateService } from '../../domain/models/session-state.service';
-import { LoginUseCase } from '../../application/auth/login.usecase';
-import { LoginKeycloakUseCase } from '../../application/auth/login-keycloak.usecase';
-import { RegisterUseCase } from '../../application/auth/register.usecase';
-import { VerifyUseCase } from '../../application/auth/verify.usecase';
-import { ForgotPasswordUseCase } from '../../application/auth/forgot-password.usecase';
-import { ResendVerificationUseCase } from '../../application/auth/resend-verification.usecase';
-import { LogoutUseCase } from '../../application/auth/logout.usecase';
-import { RefreshTokenUseCase } from '../../application/auth/refresh-token.usecase';
-import { GetCurrentUserUseCase } from '../../application/auth/get-current-user.usecase';
+import { SessionStateService } from '@presentation/services/session-state.service';
+import { BaseResponse } from '@application/dto/base/base-response';
+import { User } from '@application/dto/user/user.dto';
+import { LoginRequest, RegisterRequest, VerificationRequest, ForgotPasswordRequest } from '@application/dto/auth/auth.dto';
+import { LoginUseCase } from '@application/usecase/auth/login.usecase';
+import { LoginKeycloakUseCase } from '@application/usecase/auth/login-keycloak.usecase';
+import { RegisterUseCase } from '@application/usecase/auth/register.usecase';
+import { VerifyUseCase } from '@application/usecase/auth/verify.usecase';
+import { ForgotPasswordUseCase } from '@application/usecase/auth/forgot-password.usecase';
+import { ResendVerificationUseCase } from '@application/usecase/auth/resend-verification.usecase';
+import { LogoutUseCase } from '@application/usecase/auth/logout.usecase';
+import { RefreshTokenUseCase } from '@application/usecase/auth/refresh-token.usecase';
+import { GetCurrentUserUseCase } from '@application/usecase/auth/get-current-user.usecase';
 
 @Injectable({
   providedIn: 'root'
@@ -91,7 +92,7 @@ export class AuthService {
           const userProfile = response?.data;
           this.sessionStateService.setCurrentUser(userProfile || null);
         },
-        error: () => {}
+        error: () => { }
       })
     );
   }

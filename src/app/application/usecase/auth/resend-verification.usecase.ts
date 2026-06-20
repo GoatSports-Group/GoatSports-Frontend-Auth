@@ -1,7 +1,6 @@
 import { Inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { AuthRepository } from '../../domain/repositories/auth.repository';
-import { AUTH_REPOSITORY_TOKEN } from '../../domain/repositories/tokens';
+import { AuthRepository, AUTH_REPOSITORY_TOKEN } from '@application/ports/auth.repository';
 
 @Injectable({
   providedIn: 'root'
@@ -9,7 +8,7 @@ import { AUTH_REPOSITORY_TOKEN } from '../../domain/repositories/tokens';
 export class ResendVerificationUseCase {
   constructor(
     @Inject(AUTH_REPOSITORY_TOKEN) private authRepository: AuthRepository
-  ) {}
+  ) { }
 
   execute(email: string): Observable<any> {
     return this.authRepository.resendVerificationCode(email);

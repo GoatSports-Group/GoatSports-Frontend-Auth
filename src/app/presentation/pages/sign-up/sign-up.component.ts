@@ -1,14 +1,14 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
-import { AuthService } from '../../services/auth.service';
+import { AuthService } from '@presentation/services/auth.service';
 import { HttpErrorResponse } from '@angular/common/http';
 import { MatSnackBar } from '@angular/material/snack-bar';
 
 export const passwordMatchValidator: ValidatorFn = (control: AbstractControl): ValidationErrors | null => {
   const password = control.get('password');
   const confirmPassword = control.get('confirmPassword');
-  
+
   if (!password || !confirmPassword) return null;
 
   if (password.value !== confirmPassword.value) {
@@ -69,7 +69,7 @@ export class SignUpComponent implements OnInit {
     this.authService.register(payload).subscribe({
       next: () => {
         this.loading = false;
-        
+
         this.snackBar.open(`Đăng ký thành công tài khoản ${payload.username}! Vui lòng xác thực email.`, 'Đóng', {
           duration: 4000,
           horizontalPosition: 'end',

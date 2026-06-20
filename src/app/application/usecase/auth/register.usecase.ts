@@ -1,9 +1,9 @@
 import { Inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { BaseResponse } from '../../domain/entities/base';
-import { User, RegisterRequest } from '../../domain/entities/user';
-import { AuthRepository } from '../../domain/repositories/auth.repository';
-import { AUTH_REPOSITORY_TOKEN } from '../../domain/repositories/tokens';
+import { BaseResponse } from '@application/dto/base/base-response';
+import { User } from '@domain/entity/user';
+import { RegisterRequest } from '@application/dto/auth/auth.dto';
+import { AuthRepository, AUTH_REPOSITORY_TOKEN } from '@application/ports/auth.repository';
 
 @Injectable({
   providedIn: 'root'
@@ -11,7 +11,7 @@ import { AUTH_REPOSITORY_TOKEN } from '../../domain/repositories/tokens';
 export class RegisterUseCase {
   constructor(
     @Inject(AUTH_REPOSITORY_TOKEN) private authRepository: AuthRepository
-  ) {}
+  ) { }
 
   execute(payload: RegisterRequest): Observable<BaseResponse<User>> {
     return this.authRepository.register(payload);

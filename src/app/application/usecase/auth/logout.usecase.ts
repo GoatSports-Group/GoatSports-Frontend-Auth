@@ -1,8 +1,7 @@
 import { Inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { BaseResponse } from '../../domain/entities/base';
-import { AuthRepository } from '../../domain/repositories/auth.repository';
-import { AUTH_REPOSITORY_TOKEN } from '../../domain/repositories/tokens';
+import { BaseResponse } from '@application/dto/base/base-response';
+import { AuthRepository, AUTH_REPOSITORY_TOKEN } from '@application/ports/auth.repository';
 
 @Injectable({
   providedIn: 'root'
@@ -10,7 +9,7 @@ import { AUTH_REPOSITORY_TOKEN } from '../../domain/repositories/tokens';
 export class LogoutUseCase {
   constructor(
     @Inject(AUTH_REPOSITORY_TOKEN) private authRepository: AuthRepository
-  ) {}
+  ) { }
 
   execute(): Observable<BaseResponse<void>> {
     return this.authRepository.logout();

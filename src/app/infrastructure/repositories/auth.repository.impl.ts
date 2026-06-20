@@ -1,9 +1,10 @@
 import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
-import { AuthRepository } from '../../domain/repositories/auth.repository';
-import { AuthApi } from '../api/auth.api';
-import { BaseResponse } from '../../domain/entities/base';
-import { User, LoginRequest, RegisterRequest, VerificationRequest, ForgotPasswordRequest } from '../../domain/entities/user';
+import { BaseResponse } from '@application/dto/base/base-response';
+import { User } from '@domain/entity/user';
+import { LoginRequest, RegisterRequest, VerificationRequest, ForgotPasswordRequest } from '@application/dto/auth/auth.dto';
+import { AuthApi } from '@infrastructure/api/auth.api';
+import { AuthRepository } from '@application/ports/auth.repository';
 
 @Injectable({
   providedIn: 'root'
