@@ -5,4 +5,8 @@ import { Component } from '@angular/core';
   templateUrl: './auth.component.html',
   styleUrls: ['./auth.component.scss']
 })
-export class AuthComponent {}
+export class AuthComponent {
+  navigateToHome() {
+    window.location.href = import.meta.env.NG_APP_CLIENT_API_URL;
+  }
+}
