@@ -11,7 +11,7 @@ export class ForgotPasswordUseCase {
     @Inject(AUTH_REPOSITORY_TOKEN) private authRepository: AuthRepository
   ) { }
 
-  execute(payload: ForgotPasswordRequest): Observable<any> {
+  execute(payload: ForgotPasswordRequest): Observable<void> {
     return this.authRepository.forgotPassword(payload);
   }
 }

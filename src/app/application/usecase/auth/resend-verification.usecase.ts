@@ -10,7 +10,7 @@ export class ResendVerificationUseCase {
     @Inject(AUTH_REPOSITORY_TOKEN) private authRepository: AuthRepository
   ) { }
 
-  execute(email: string): Observable<any> {
+  execute(email: string): Observable<void> {
     return this.authRepository.resendVerificationCode(email);
   }
 }

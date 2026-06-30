@@ -55,9 +55,8 @@ export class SignInComponent implements OnInit {
   loginWithKeycloakCode(code: string) {
     this.loading = true;
     this.authService.loginWithKeycloak({ code, redirectUri: window.location.origin }).subscribe({
-      next: (response) => {
+      next: (user) => {
         this.loading = false;
-        const user = response?.data;
 
         const snackBarRef = this.snackBar.open(`Chào mừng ${user?.fullName || user?.username} đã quay trở lại!`, 'Đóng', {
           duration: 3000,
@@ -130,9 +129,8 @@ export class SignInComponent implements OnInit {
     };
 
     this.authService.login(payload).subscribe({
-      next: (response) => {
+      next: (user) => {
         this.loading = false;
-        const user = response?.data;
 
         const snackBarRef = this.snackBar.open(`Chào mừng ${user?.fullName || user?.username} đã quay trở lại!`, 'Đóng', {
           duration: 1000,

@@ -1,6 +1,5 @@
 import { Inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { BaseResponse } from '@application/dto/base/base-response';
 import { User } from '@domain/entity/user';
 import { AuthRepository, AUTH_REPOSITORY_TOKEN } from '@application/ports/auth.repository';
 
@@ -12,7 +11,7 @@ export class LoginKeycloakUseCase {
     @Inject(AUTH_REPOSITORY_TOKEN) private authRepository: AuthRepository
   ) { }
 
-  execute(payload: { code: string; redirectUri: string }): Observable<BaseResponse<User>> {
+  execute(payload: { code: string; redirectUri: string }): Observable<User> {
     return this.authRepository.loginWithKeycloak(payload);
   }
 }

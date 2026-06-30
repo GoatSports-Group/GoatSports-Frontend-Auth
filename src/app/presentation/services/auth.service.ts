@@ -2,7 +2,6 @@ import { Injectable, inject } from '@angular/core';
 import { Observable, tap } from 'rxjs';
 import { Router } from '@angular/router';
 import { SessionStateService } from '@presentation/services/session-state.service';
-import { BaseResponse } from '@application/dto/base/base-response';
 import { User } from '@application/dto/user/user.dto';
 import { LoginRequest, RegisterRequest, VerificationRequest, ForgotPasswordRequest } from '@application/dto/auth/auth.dto';
 import { LoginUseCase } from '@application/usecase/auth/login.usecase';
@@ -40,45 +39,42 @@ export class AuthService {
     this.loadSession();
   }
 
-  login(payload: LoginRequest): Observable<BaseResponse<User>> {
+  login(payload: LoginRequest): Observable<User> {
     return this.loginUseCase.execute(payload).pipe(
-      tap(response => {
-        const userProfile = response?.data;
+      tap(userProfile => {
         this.sessionStateService.setCurrentUser(userProfile || null);
       })
     );
   }
 
-  loginWithKeycloak(payload: { code: string; redirectUri: string }): Observable<BaseResponse<User>> {
+  loginWithKeycloak(payload: { code: string; redirectUri: string }): Observable<User> {
     return this.loginKeycloakUseCase.execute(payload).pipe(
-      tap(response => {
-        const userProfile = response?.data;
+      tap(userProfile => {
         this.sessionStateService.setCurrentUser(userProfile || null);
       })
     );
   }
 
-  register(payload: RegisterRequest): Observable<BaseResponse<User>> {
+  register(payload: RegisterRequest): Observable<User> {
     return this.registerUseCase.execute(payload);
   }
 
-  verify(payload: VerificationRequest): Observable<BaseResponse<void>> {
+  verify(payload: VerificationRequest): Observable<void> {
     return this.verifyUseCase.execute(payload);
   }
 
-  forgotPassword(payload: ForgotPasswordRequest): Observable<any> {
+  forgotPassword(payload: ForgotPasswordRequest): Observable<void> {
     return this.forgotPasswordUseCase.execute(payload);
   }
 
-  resendVerificationCode(email: string): Observable<any> {
+  resendVerificationCode(email: string): Observable<void> {
     return this.resendVerificationUseCase.execute(email);
   }
 
-  refresh(): Observable<BaseResponse<User>> {
+  refresh(): Observable<User> {
     return this.refreshTokenUseCase.execute().pipe(
       tap({
-        next: response => {
-          const userProfile = response?.data;
+        next: userProfile => {
           this.sessionStateService.setCurrentUser(userProfile || null);
         },
         error: () => { }
@@ -86,11 +82,10 @@ export class AuthService {
     );
   }
 
-  getCurrentUser(): Observable<BaseResponse<User>> {
+  getCurrentUser(): Observable<User> {
     return this.getCurrentUserUseCase.execute().pipe(
       tap({
-        next: response => {
-          const userProfile = response?.data;
+        next: userProfile => {
           this.sessionStateService.setCurrentUser(userProfile || null);
         },
         error: () => {
