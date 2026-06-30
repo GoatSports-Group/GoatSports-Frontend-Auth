@@ -1,5 +1,9 @@
 <div class="auth-card-container">
-  <mat-card class="mat-elevation-z4 auth-card">
+  <mat-card class="mat-elevation-z0 auth-card animate-slide-up">
+    @if (loading) {
+    <div class="loading-progress-bar"></div>
+    }
+
     <mat-card-header class="auth-card-header">
       <a (click)="navigateToHome()" class="header-logo">
         <img src="assets/images/goat.png" alt="Goat Sports Logo" class="logo-img">
@@ -16,7 +20,7 @@
         <mat-form-field appearance="outline" class="full-width">
           <mat-label>Tên đăng nhập hoặc Email</mat-label>
           <input matInput type="text" formControlName="username" placeholder="Nhập username hoặc email" required>
-          <mat-icon matPrefix color="primary">person</mat-icon>
+          <mat-icon matPrefix>person</mat-icon>
           @if (loginForm.get('username')?.hasError('required')) {
           <mat-error>Tên đăng nhập không được để trống</mat-error>
           }
@@ -27,9 +31,9 @@
           <mat-label>Mật khẩu</mat-label>
           <input matInput [type]="hidePassword ? 'password' : 'text'" formControlName="password" placeholder="••••••••"
             required>
-          <mat-icon matPrefix color="primary">lock</mat-icon>
+          <mat-icon matPrefix>lock</mat-icon>
           <button mat-icon-button matSuffix (click)="hidePassword = !hidePassword" type="button"
-            aria-label="Toggle password visibility">
+            aria-label="Toggle password visibility" class="password-toggle-btn">
             <mat-icon>{{ hidePassword ? 'visibility_off' : 'visibility' }}</mat-icon>
           </button>
           @if (loginForm.get('password')?.hasError('required')) {
@@ -49,7 +53,10 @@
         <button mat-flat-button color="primary" type="submit" [disabled]="loginForm.invalid || loading"
           class="full-width submit-btn">
           @if (loading) {
-          <span class="btn-loading-text">Đang đăng nhập...</span>
+          <div class="spinner-btn-wrapper">
+            <span class="btn-loading-text">Đang đăng nhập</span>
+            <span class="dots-loading"></span>
+          </div>
           } @else {
           <span>Đăng Nhập</span>
           }
@@ -65,15 +72,6 @@
       <!-- Keycloak Login Button -->
       <button mat-stroked-button type="button" class="full-width keycloak-btn" [disabled]="loading"
         (click)="redirectToKeycloak()">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" class="keycloak-svg-icon">
-          <!-- A beautiful premium vector keycloak/shield icon -->
-          <path
-            d="M50 5C25.1 5 5 25.1 5 50c0 18.2 10.8 33.9 26.5 41.2l.5-.8 18-35.9L32 36.5c-.8-.8-.8-2 0-2.8l2.8-2.8c.8-.8 2-.8 2.8 0l18 18 18-18c.8-.8 2-.8 2.8 0l2.8 2.8c.8.8.8 2 0 2.8L62 54.5l18 35.9.5.8C94.2 83.9 105 68.2 105 50c0-24.9-20.1-45-45-45z"
-            fill="#0088cc" />
-          <path
-            d="M50 25c-13.8 0-25 11.2-25 25 0 8.7 4.5 16.4 11.2 20.8L50 43.3l13.8 27.5c6.7-4.4 11.2-12.1 11.2-20.8 0-13.8-11.2-25-25-25zm0 35c-5.5 0-10-4.5-10-10s4.5-10 10-10 10 4.5 10 10-4.5 10-10 10z"
-            fill="#ff7f00" />
-        </svg>
         <span>Đăng nhập bằng Keycloak</span>
       </button>
     </mat-card-content>

@@ -1,5 +1,9 @@
 <div class="auth-card-container">
-  <mat-card class="mat-elevation-z4 auth-card">
+  <mat-card class="mat-elevation-z0 auth-card animate-slide-up">
+    @if (loading) {
+      <div class="loading-progress-bar"></div>
+    }
+
     <mat-card-header class="auth-card-header">
       <a (click)="navigateToHome()" class="header-logo">
         <img src="assets/images/goat.png" alt="Goat Sports Logo" class="logo-img">
@@ -16,39 +20,41 @@
         <mat-form-field appearance="outline" class="full-width">
           <mat-label>Email</mat-label>
           <input matInput type="email" formControlName="email" placeholder="example@gmail.com" required readonly>
-          <mat-icon matPrefix color="primary">email</mat-icon>
+          <mat-icon matPrefix>email</mat-icon>
           @if (verifyForm.get('email')?.hasError('required')) {
-          <mat-error>Email không được để trống</mat-error>
+            <mat-error>Email không được để trống</mat-error>
           }
           @if (verifyForm.get('email')?.hasError('email')) {
-          <mat-error>Email không đúng định dạng</mat-error>
+            <mat-error>Email không đúng định dạng</mat-error>
           }
         </mat-form-field>
 
         <label class="otp-label-desc">Mã xác thực</label>
         <div class="otp-inputs-container">
           @for (digit of [0, 1, 2, 3, 4, 5]; track $index) {
-          <input type="text" maxlength="1" class="otp-digit-input" [(ngModel)]="otp[$index]"
-            [ngModelOptions]="{standalone: true}" (keyup)="onOtpKeyUp($event, $index)"
-            (keydown)="onOtpKeyDown($event, $index)" pattern="\d*">
+            <input type="text" maxlength="1" class="otp-digit-input" [(ngModel)]="otp[$index]"
+              [ngModelOptions]="{standalone: true}" (keyup)="onOtpKeyUp($event, $index)"
+              (keydown)="onOtpKeyDown($event, $index)" pattern="\d*">
           }
         </div>
 
-        <button mat-flat-button color="primary" type="submit" [disabled]="!isOtpComplete || loading"
-          class="full-width submit-btn margin-top-md">
+        <button mat-flat-button color="primary" type="submit" [disabled]="!isOtpComplete || loading" class="full-width submit-btn margin-top-md">
           @if (loading) {
-          <span class="btn-loading-text">Đang xác thực...</span>
+            <div class="spinner-btn-wrapper">
+              <span class="btn-loading-text">Đang xác thực</span>
+              <span class="dots-loading"></span>
+            </div>
           } @else {
-          <span>Xác Thực</span>
+            <span>Xác Thực</span>
           }
         </button>
 
         <p class="resend-text">
           Không nhận được mã?
           @if (countdown > 0) {
-          <span class="resend-disabled">Gửi Lại sau {{ countdown }}s</span>
+            <span class="resend-disabled">Gửi Lại sau <strong>{{ countdown }}s</strong></span>
           } @else {
-          <a (click)="resendCode()" class="resend-link">Gửi Lại</a>
+            <a (click)="resendCode()" class="resend-link animate-pulse-glow">Gửi Lại Mã</a>
           }
         </p>
 
