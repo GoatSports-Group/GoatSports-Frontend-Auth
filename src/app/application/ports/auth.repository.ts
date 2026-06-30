@@ -11,7 +11,6 @@ export interface AuthRepository {
   verify(payload: VerificationRequest): Observable<BaseResponse<void>>;
   forgotPassword(payload: ForgotPasswordRequest): Observable<any>;
   resendVerificationCode(email: string): Observable<any>;
-  logout(): Observable<BaseResponse<void>>;
   refresh(): Observable<BaseResponse<User>>;
   getCurrentUser(): Observable<BaseResponse<User>>;
 }

@@ -36,10 +36,6 @@ export class AuthRepositoryImpl implements AuthRepository {
     return this.authApi.resendVerificationCode(email);
   }
 
-  logout(): Observable<BaseResponse<void>> {
-    return this.authApi.logout();
-  }
-
   refresh(): Observable<BaseResponse<User>> {
     return this.authApi.refresh();
   }

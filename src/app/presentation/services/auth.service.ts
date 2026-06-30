@@ -11,7 +11,6 @@ import { RegisterUseCase } from '@application/usecase/auth/register.usecase';
 import { VerifyUseCase } from '@application/usecase/auth/verify.usecase';
 import { ForgotPasswordUseCase } from '@application/usecase/auth/forgot-password.usecase';
 import { ResendVerificationUseCase } from '@application/usecase/auth/resend-verification.usecase';
-import { LogoutUseCase } from '@application/usecase/auth/logout.usecase';
 import { RefreshTokenUseCase } from '@application/usecase/auth/refresh-token.usecase';
 import { GetCurrentUserUseCase } from '@application/usecase/auth/get-current-user.usecase';
 
@@ -28,7 +27,6 @@ export class AuthService {
   private verifyUseCase = inject(VerifyUseCase);
   private forgotPasswordUseCase = inject(ForgotPasswordUseCase);
   private resendVerificationUseCase = inject(ResendVerificationUseCase);
-  private logoutUseCase = inject(LogoutUseCase);
   private refreshTokenUseCase = inject(RefreshTokenUseCase);
   private getCurrentUserUseCase = inject(GetCurrentUserUseCase);
 
@@ -74,15 +72,6 @@ export class AuthService {
 
   resendVerificationCode(email: string): Observable<any> {
     return this.resendVerificationUseCase.execute(email);
-  }
-
-  logout(): Observable<BaseResponse<void>> {
-    return this.logoutUseCase.execute().pipe(
-      tap({
-        next: () => this.performLogout(),
-        error: () => this.performLogout()
-      })
-    );
   }
 
   refresh(): Observable<BaseResponse<User>> {

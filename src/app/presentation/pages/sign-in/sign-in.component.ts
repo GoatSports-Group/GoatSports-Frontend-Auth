@@ -59,7 +59,7 @@ export class SignInComponent implements OnInit {
         this.loading = false;
         const user = response?.data;
 
-        this.snackBar.open(`Chào mừng ${user?.fullName || user?.username} đã quay trở lại!`, 'Đóng', {
+        const snackBarRef = this.snackBar.open(`Chào mừng ${user?.fullName || user?.username} đã quay trở lại!`, 'Đóng', {
           duration: 3000,
           horizontalPosition: 'end',
           verticalPosition: 'top',
@@ -72,18 +72,20 @@ export class SignInComponent implements OnInit {
           queryParamsHandling: 'merge'
         });
 
-        const redirectUrl = this.route.snapshot.queryParams['redirect'];
-        if (redirectUrl) {
-          window.location.href = redirectUrl;
-        } else {
-          const roleName = (user?.role?.name || '').toUpperCase();
-          const isAdmin = roleName === 'ADMIN';
-          if (isAdmin) {
-            window.location.href = `${import.meta.env.NG_APP_ADMIN_API_URL}`;
+        snackBarRef.afterDismissed().subscribe(() => {
+          const redirectUrl = this.route.snapshot.queryParams['redirect'];
+          if (redirectUrl) {
+            window.location.href = redirectUrl;
           } else {
-            window.location.href = import.meta.env.NG_APP_CLIENT_API_URL;
+            const roleName = (user?.role?.name || '').toUpperCase();
+            const isAdmin = roleName === 'ADMIN';
+            if (isAdmin) {
+              window.location.href = `${import.meta.env.NG_APP_ADMIN_API_URL}`;
+            } else {
+              window.location.href = import.meta.env.NG_APP_CLIENT_API_URL;
+            }
           }
-        }
+        });
       },
       error: (err: HttpErrorResponse) => {
         this.loading = false;
@@ -132,25 +134,27 @@ export class SignInComponent implements OnInit {
         this.loading = false;
         const user = response?.data;
 
-        this.snackBar.open(`Chào mừng ${user?.fullName || user?.username} đã quay trở lại!`, 'Đóng', {
-          duration: 3000,
+        const snackBarRef = this.snackBar.open(`Chào mừng ${user?.fullName || user?.username} đã quay trở lại!`, 'Đóng', {
+          duration: 1000,
           horizontalPosition: 'end',
           verticalPosition: 'top',
           panelClass: ['snackbar-success']
         });
 
-        const redirectUrl = this.route.snapshot.queryParams['redirect'];
-        if (redirectUrl) {
-          window.location.href = redirectUrl;
-        } else {
-          const roleName = (user?.role?.name || '').toUpperCase();
-          const isAdmin = roleName === 'ADMIN' || roleName === 'STAFF' || roleName === 'NGƯỜI QUẢN TRỊ' || roleName === 'NHÂN VIÊN';
-          if (isAdmin) {
-            window.location.href = `${import.meta.env.NG_APP_ADMIN_API_URL}`;
+        snackBarRef.afterDismissed().subscribe(() => {
+          const redirectUrl = this.route.snapshot.queryParams['redirect'];
+          if (redirectUrl) {
+            window.location.href = redirectUrl;
           } else {
-            window.location.href = import.meta.env.NG_APP_CLIENT_API_URL;
+            const roleName = (user?.role?.name || '').toUpperCase();
+            const isAdmin = roleName === 'ADMIN';
+            if (isAdmin) {
+              window.location.href = `${import.meta.env.NG_APP_ADMIN_API_URL}`;
+            } else {
+              window.location.href = import.meta.env.NG_APP_CLIENT_API_URL;
+            }
           }
-        }
+        });
       },
       error: (err: HttpErrorResponse) => {
         this.loading = false;
