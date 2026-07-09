@@ -29,15 +29,16 @@ export class SignInComponent implements OnInit {
 
     this.authService.sessionReady$.subscribe(ready => {
       if (ready && this.authService.isAuthenticated) {
-        const redirectUrl = this.route.snapshot.queryParams['redirect'];
-        if (redirectUrl) {
-          window.location.href = redirectUrl;
+        const user = this.authService.currentUser;
+        const roleName = (user?.role?.name || '').toUpperCase();
+        const isAdmin = roleName === 'ADMIN';
+
+        if (isAdmin) {
+          window.location.href = `${import.meta.env.NG_APP_ADMIN_API_URL}`;
         } else {
-          const user = this.authService.currentUser;
-          const roleName = (user?.role?.name || '').toUpperCase();
-          const isAdmin = roleName === 'ADMIN';
-          if (isAdmin) {
-            window.location.href = `${import.meta.env.NG_APP_ADMIN_API_URL}/admin`;
+          const redirectUrl = this.route.snapshot.queryParams['redirect'];
+          if (redirectUrl) {
+            window.location.href = redirectUrl;
           } else {
             window.location.href = import.meta.env.NG_APP_CLIENT_API_URL;
           }
@@ -68,14 +69,20 @@ export class SignInComponent implements OnInit {
         });
 
         snackBarRef.afterDismissed().subscribe(() => {
-          const redirectUrl = this.route.snapshot.queryParams['redirect'];
-          if (redirectUrl) {
-            window.location.href = redirectUrl;
+          const roleName = (user?.role?.name || '').toUpperCase();
+          const isAdmin = roleName === 'ADMIN';
+
+          if (isAdmin) {
+            const redirectUrl = this.route.snapshot.queryParams['redirect'];
+            if (redirectUrl && redirectUrl.includes('localhost:4300')) {
+              window.location.href = redirectUrl;
+            } else {
+              window.location.href = `${import.meta.env.NG_APP_ADMIN_API_URL}/admin`;
+            }
           } else {
-            const roleName = (user?.role?.name || '').toUpperCase();
-            const isAdmin = roleName === 'ADMIN';
-            if (isAdmin) {
-              window.location.href = `${import.meta.env.NG_APP_ADMIN_API_URL}`;
+            const redirectUrl = this.route.snapshot.queryParams['redirect'];
+            if (redirectUrl) {
+              window.location.href = redirectUrl;
             } else {
               window.location.href = import.meta.env.NG_APP_CLIENT_API_URL;
             }
