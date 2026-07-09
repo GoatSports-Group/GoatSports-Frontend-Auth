@@ -6,6 +6,7 @@ declare interface Env {
   readonly NG_APP_ADMIN_API_URL: string;
   readonly NG_APP_AUTH_API_URL: string;
   readonly NG_APP_KEYCLOAK_URL: string;
+  readonly NG_APP_BACKEND_CALLBACK_URL: string;
   readonly NG_APP_KEYCLOAK_REALM: string;
   readonly NG_APP_KEYCLOAK_CLIENT_ID: string;
   [key: string]: any;

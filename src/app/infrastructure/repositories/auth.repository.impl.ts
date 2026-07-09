@@ -18,12 +18,6 @@ export class AuthRepositoryImpl implements AuthRepository {
     );
   }
 
-  loginWithKeycloak(payload: { code: string; redirectUri: string }): Observable<User> {
-    return this.authApi.loginWithKeycloak(payload).pipe(
-      map(response => response.data)
-    );
-  }
-
   register(payload: RegisterRequest): Observable<User> {
     return this.authApi.register(payload).pipe(
       map(response => response.data)

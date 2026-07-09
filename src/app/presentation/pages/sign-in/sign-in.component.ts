@@ -27,12 +27,6 @@ export class SignInComponent implements OnInit {
       password: ['', [Validators.required, Validators.pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/)]]
     });
 
-    const code = this.route.snapshot.queryParams['code'];
-    if (code) {
-      this.loginWithKeycloakCode(code);
-      return;
-    }
-
     this.authService.sessionReady$.subscribe(ready => {
       if (ready && this.authService.isAuthenticated) {
         const redirectUrl = this.route.snapshot.queryParams['redirect'];
@@ -50,72 +44,6 @@ export class SignInComponent implements OnInit {
         }
       }
     });
-  }
-
-  loginWithKeycloakCode(code: string) {
-    this.loading = true;
-    this.authService.loginWithKeycloak({ code, redirectUri: window.location.origin }).subscribe({
-      next: (user) => {
-        this.loading = false;
-
-        const snackBarRef = this.snackBar.open(`Chào mừng ${user?.fullName || user?.username} đã quay trở lại!`, 'Đóng', {
-          duration: 3000,
-          horizontalPosition: 'end',
-          verticalPosition: 'top',
-          panelClass: ['snackbar-success']
-        });
-
-        // Clean up Keycloak URL query params
-        this.router.navigate([], {
-          queryParams: { code: null, session_state: null, iss: null },
-          queryParamsHandling: 'merge'
-        });
-
-        snackBarRef.afterDismissed().subscribe(() => {
-          const redirectUrl = this.route.snapshot.queryParams['redirect'];
-          if (redirectUrl) {
-            window.location.href = redirectUrl;
-          } else {
-            const roleName = (user?.role?.name || '').toUpperCase();
-            const isAdmin = roleName === 'ADMIN';
-            if (isAdmin) {
-              window.location.href = `${import.meta.env.NG_APP_ADMIN_API_URL}`;
-            } else {
-              window.location.href = import.meta.env.NG_APP_CLIENT_API_URL;
-            }
-          }
-        });
-      },
-      error: (err: HttpErrorResponse) => {
-        this.loading = false;
-        this.router.navigate([], {
-          queryParams: { code: null, session_state: null, iss: null },
-          queryParamsHandling: 'merge'
-        });
-        const errorMsg = err.error?.message || 'Đăng nhập bằng Keycloak thất bại!';
-        this.snackBar.open(errorMsg, 'Đóng', {
-          duration: 4000,
-          horizontalPosition: 'end',
-          verticalPosition: 'top',
-          panelClass: ['snackbar-error']
-        });
-      }
-    });
-  }
-
-  redirectToKeycloak() {
-    const keycloakUrl = import.meta.env.NG_APP_KEYCLOAK_URL;
-    const realm = import.meta.env.NG_APP_KEYCLOAK_REALM;
-    const clientId = import.meta.env.NG_APP_KEYCLOAK_CLIENT_ID;
-    const redirectUri = window.location.origin;
-
-    const authUrl = `${keycloakUrl}/realms/${realm}/protocol/openid-connect/auth`
-      + `?client_id=${encodeURIComponent(clientId)}`
-      + `&response_type=code`
-      + `&redirect_uri=${encodeURIComponent(redirectUri)}`
-      + `&scope=openid`;
-
-    window.location.href = authUrl;
   }
 
   login() {
@@ -177,5 +105,25 @@ export class SignInComponent implements OnInit {
 
   navigateToForgotPassword() {
     this.router.navigate(['/forgot-password'], { queryParamsHandling: 'preserve' });
+  }
+
+  loginWithGoogle() {
+    const keycloakUrl = import.meta.env.NG_APP_KEYCLOAK_URL;
+    const callbackUrl = import.meta.env.NG_APP_BACKEND_CALLBACK_URL;
+    const realm = import.meta.env.NG_APP_KEYCLOAK_REALM;
+    const clientId = import.meta.env.NG_APP_KEYCLOAK_CLIENT_ID;
+
+    const redirectUrlParam = this.route.snapshot.queryParams['redirect'];
+    const frontendRedirectTarget = redirectUrlParam || import.meta.env.NG_APP_CLIENT_API_URL;
+
+    const authUrl = `${keycloakUrl}/realms/${realm}/protocol/openid-connect/auth`
+      + `?client_id=${encodeURIComponent(clientId)}`
+      + `&response_type=code`
+      + `&redirect_uri=${encodeURIComponent(callbackUrl)}`
+      + `&state=${encodeURIComponent(frontendRedirectTarget)}`
+      + `&scope=openid`
+      + `&kc_idp_hint=google`;
+
+    window.location.href = authUrl;
   }
 }

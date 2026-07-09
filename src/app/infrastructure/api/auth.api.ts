@@ -20,14 +20,6 @@ export class AuthApi {
     );
   }
 
-  loginWithKeycloak(payload: { code: string; redirectUri: string }): Observable<BaseResponse<User>> {
-    return this.http.post<BaseResponse<User>>(
-      `${this.apiBase}/auth-service/api/v1/auth/login/keycloak`,
-      payload,
-      { withCredentials: true }
-    );
-  }
-
   register(payload: RegisterRequest): Observable<BaseResponse<User>> {
     return this.http.post<BaseResponse<User>>(
       `${this.apiBase}/auth-service/api/v1/auth/register`,

@@ -5,7 +5,6 @@ import { LoginRequest, RegisterRequest, VerificationRequest, ForgotPasswordReque
 
 export interface AuthRepository {
   login(payload: LoginRequest): Observable<User>;
-  loginWithKeycloak(payload: { code: string; redirectUri: string }): Observable<User>;
   register(payload: RegisterRequest): Observable<User>;
   verify(payload: VerificationRequest): Observable<void>;
   forgotPassword(payload: ForgotPasswordRequest): Observable<void>;

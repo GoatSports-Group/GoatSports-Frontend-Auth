@@ -5,7 +5,6 @@ import { SessionStateService } from '@presentation/services/session-state.servic
 import { User } from '@application/dto/user/user.dto';
 import { LoginRequest, RegisterRequest, VerificationRequest, ForgotPasswordRequest } from '@application/dto/auth/auth.dto';
 import { LoginUseCase } from '@application/usecase/auth/login.usecase';
-import { LoginKeycloakUseCase } from '@application/usecase/auth/login-keycloak.usecase';
 import { RegisterUseCase } from '@application/usecase/auth/register.usecase';
 import { VerifyUseCase } from '@application/usecase/auth/verify.usecase';
 import { ForgotPasswordUseCase } from '@application/usecase/auth/forgot-password.usecase';
@@ -21,7 +20,6 @@ export class AuthService {
   private router = inject(Router);
 
   private loginUseCase = inject(LoginUseCase);
-  private loginKeycloakUseCase = inject(LoginKeycloakUseCase);
   private registerUseCase = inject(RegisterUseCase);
   private verifyUseCase = inject(VerifyUseCase);
   private forgotPasswordUseCase = inject(ForgotPasswordUseCase);
@@ -41,14 +39,6 @@ export class AuthService {
 
   login(payload: LoginRequest): Observable<User> {
     return this.loginUseCase.execute(payload).pipe(
-      tap(userProfile => {
-        this.sessionStateService.setCurrentUser(userProfile || null);
-      })
-    );
-  }
-
-  loginWithKeycloak(payload: { code: string; redirectUri: string }): Observable<User> {
-    return this.loginKeycloakUseCase.execute(payload).pipe(
       tap(userProfile => {
         this.sessionStateService.setCurrentUser(userProfile || null);
       })
@@ -121,13 +111,20 @@ export class AuthService {
   }
 
   private loadSession() {
-    this.refresh().subscribe({
+    this.getCurrentUser().subscribe({
       next: () => {
         this.sessionStateService.setSessionReady(true);
       },
       error: () => {
-        this.clearSession();
-        this.sessionStateService.setSessionReady(true);
+        this.refresh().subscribe({
+          next: () => {
+            this.sessionStateService.setSessionReady(true);
+          },
+          error: () => {
+            this.clearSession();
+            this.sessionStateService.setSessionReady(true);
+          }
+        });
       }
     });
   }
