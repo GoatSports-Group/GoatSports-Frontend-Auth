@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { AuthComponent } from '@presentation/layout/auth.component';
+import { AuthComponent } from '@shared/layouts/auth/auth.component';
 import { SignInComponent } from '@presentation/pages/sign-in/sign-in.component';
 import { SignUpComponent } from '@presentation/pages/sign-up/sign-up.component';
 import { VerifyComponent } from '@presentation/pages/verify/verify.component';

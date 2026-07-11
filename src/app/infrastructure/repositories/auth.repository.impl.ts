@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { User } from '@domain/entity/user';
+import { User } from '@domain/entities/user';
 import { LoginRequest, RegisterRequest, VerificationRequest, ForgotPasswordRequest } from '@application/dto/auth/auth.dto';
 import { AuthApi } from '@infrastructure/api/auth.api';
 import { AuthRepository } from '@application/ports/auth.repository';
