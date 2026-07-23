@@ -6,9 +6,10 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { AuthService } from '@presentation/services/auth.service';
 
 @Component({
-  selector: 'app-forgot-password',
-  templateUrl: './forgot-password.component.html',
-  styleUrls: ['./forgot-password.component.scss']
+    selector: 'app-forgot-password',
+    templateUrl: './forgot-password.component.html',
+    styleUrls: ['./forgot-password.component.scss'],
+    standalone: false
 })
 export class ForgotPasswordComponent {
   private fb = inject(FormBuilder);

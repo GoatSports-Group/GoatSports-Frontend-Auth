@@ -6,9 +6,10 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { AuthService } from '@presentation/services/auth.service';
 
 @Component({
-  selector: 'app-verify',
-  templateUrl: './verify.component.html',
-  styleUrls: ['./verify.component.scss']
+    selector: 'app-verify',
+    templateUrl: './verify.component.html',
+    styleUrls: ['./verify.component.scss'],
+    standalone: false
 })
 export class VerifyComponent implements OnInit, OnDestroy {
   private fb = inject(FormBuilder);
