@@ -4,13 +4,14 @@ import { Observable } from 'rxjs';
 import { BaseResponse } from '@application/dto/base/base-response';
 import { User } from '@domain/entities/user';
 import { LoginRequest, RegisterRequest, VerificationRequest, ForgotPasswordRequest } from '@application/dto/auth/auth.dto';
+import { environment } from "@environments/environment";
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthApi {
   private http = inject(HttpClient);
-  private apiBase = import.meta.env.NG_APP_API_URL;
+  private apiBase = environment.apiUrl;
 
   login(payload: LoginRequest): Observable<BaseResponse<User>> {
     return this.http.post<BaseResponse<User>>(

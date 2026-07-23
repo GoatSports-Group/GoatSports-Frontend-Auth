@@ -1,3 +1,8 @@
+/* Angular Material Prebuilt Theme And Tailwindcss */
+@use '@angular/material/prebuilt-themes/cyan-orange.css';
+@use 'material-icons/iconfont/material-icons.scss';
+@use "tailwindcss";
+
 /* Import Fonts */
 @font-face {
   font-family: 'Be Vietnam Pro';
@@ -5,102 +10,119 @@
   font-weight: 100;
   font-style: normal;
 }
+
 @font-face {
   font-family: 'Be Vietnam Pro';
   src: url('./assets/fonts/Be_Vietnam_Pro/BeVietnamPro-ThinItalic.ttf') format('truetype');
   font-weight: 100;
   font-style: italic;
 }
+
 @font-face {
   font-family: 'Be Vietnam Pro';
   src: url('./assets/fonts/Be_Vietnam_Pro/BeVietnamPro-ExtraLight.ttf') format('truetype');
   font-weight: 200;
   font-style: normal;
 }
+
 @font-face {
   font-family: 'Be Vietnam Pro';
   src: url('./assets/fonts/Be_Vietnam_Pro/BeVietnamPro-ExtraLightItalic.ttf') format('truetype');
   font-weight: 200;
   font-style: italic;
 }
+
 @font-face {
   font-family: 'Be Vietnam Pro';
   src: url('./assets/fonts/Be_Vietnam_Pro/BeVietnamPro-Light.ttf') format('truetype');
   font-weight: 300;
   font-style: normal;
 }
+
 @font-face {
   font-family: 'Be Vietnam Pro';
   src: url('./assets/fonts/Be_Vietnam_Pro/BeVietnamPro-LightItalic.ttf') format('truetype');
   font-weight: 300;
   font-style: italic;
 }
+
 @font-face {
   font-family: 'Be Vietnam Pro';
   src: url('./assets/fonts/Be_Vietnam_Pro/BeVietnamPro-Regular.ttf') format('truetype');
   font-weight: 400;
   font-style: normal;
 }
+
 @font-face {
   font-family: 'Be Vietnam Pro';
   src: url('./assets/fonts/Be_Vietnam_Pro/BeVietnamPro-Italic.ttf') format('truetype');
   font-weight: 400;
   font-style: italic;
 }
+
 @font-face {
   font-family: 'Be Vietnam Pro';
   src: url('./assets/fonts/Be_Vietnam_Pro/BeVietnamPro-Medium.ttf') format('truetype');
   font-weight: 500;
   font-style: normal;
 }
+
 @font-face {
   font-family: 'Be Vietnam Pro';
   src: url('./assets/fonts/Be_Vietnam_Pro/BeVietnamPro-MediumItalic.ttf') format('truetype');
   font-weight: 500;
   font-style: italic;
 }
+
 @font-face {
   font-family: 'Be Vietnam Pro';
   src: url('./assets/fonts/Be_Vietnam_Pro/BeVietnamPro-SemiBold.ttf') format('truetype');
   font-weight: 600;
   font-style: normal;
 }
+
 @font-face {
   font-family: 'Be Vietnam Pro';
   src: url('./assets/fonts/Be_Vietnam_Pro/BeVietnamPro-SemiBoldItalic.ttf') format('truetype');
   font-weight: 600;
   font-style: italic;
 }
+
 @font-face {
   font-family: 'Be Vietnam Pro';
   src: url('./assets/fonts/Be_Vietnam_Pro/BeVietnamPro-Bold.ttf') format('truetype');
   font-weight: 700;
   font-style: normal;
 }
+
 @font-face {
   font-family: 'Be Vietnam Pro';
   src: url('./assets/fonts/Be_Vietnam_Pro/BeVietnamPro-BoldItalic.ttf') format('truetype');
   font-weight: 700;
   font-style: italic;
 }
+
 @font-face {
   font-family: 'Be Vietnam Pro';
   src: url('./assets/fonts/Be_Vietnam_Pro/BeVietnamPro-ExtraBold.ttf') format('truetype');
   font-weight: 800;
   font-style: normal;
 }
+
 @font-face {
   font-family: 'Be Vietnam Pro';
   src: url('./assets/fonts/Be_Vietnam_Pro/BeVietnamPro-ExtraBoldItalic.ttf') format('truetype');
   font-weight: 800;
   font-style: italic;
 }
+
 @font-face {
   font-family: 'Be Vietnam Pro';
   src: url('./assets/fonts/Be_Vietnam_Pro/BeVietnamPro-Black.ttf') format('truetype');
   font-weight: 900;
   font-style: normal;
 }
+
 @font-face {
   font-family: 'Be Vietnam Pro';
   src: url('./assets/fonts/Be_Vietnam_Pro/BeVietnamPro-BlackItalic.ttf') format('truetype');
@@ -277,6 +299,7 @@ a {
     border-radius: var(--border-radius-sm) !important;
     background-color: #ffffff !important;
   }
+
   .mat-mdc-form-field-infix {
     width: auto !important;
     flex: 1 1 auto !important;
@@ -312,6 +335,7 @@ a {
   }
 
   &.mat-focused {
+
     .mdc-notched-outline__leading,
     .mdc-notched-outline__notch,
     .mdc-notched-outline__trailing {
@@ -403,10 +427,6 @@ mat-icon[color="primary"] {
   }
 }
 
-/* Angular Material Prebuilt Theme */
-@import '@angular/material/prebuilt-themes/cyan-orange.css';
-@import 'material-icons/iconfont/material-icons.css';
-
 /* Make validation errors high contrast and bold red */
 mat-error,
 .mat-mdc-form-field-error {
@@ -422,6 +442,7 @@ mat-error,
   from {
     opacity: 0;
   }
+
   to {
     opacity: 1;
   }
@@ -432,6 +453,7 @@ mat-error,
     opacity: 0;
     transform: translateY(25px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -443,6 +465,7 @@ mat-error,
     opacity: 0;
     transform: scale(0.96);
   }
+
   to {
     opacity: 1;
     transform: scale(1);
@@ -453,9 +476,11 @@ mat-error,
   0% {
     box-shadow: 0 0 0 0 rgba(5, 150, 105, 0.4);
   }
+
   70% {
     box-shadow: 0 0 0 10px rgba(5, 150, 105, 0);
   }
+
   100% {
     box-shadow: 0 0 0 0 rgba(5, 150, 105, 0);
   }
@@ -491,6 +516,7 @@ mat-error,
 /* Hover effects upgrades */
 .hover-scale {
   transition: var(--transition-smooth) !important;
+
   &:hover {
     transform: translateY(-4px) scale(1.02) !important;
     box-shadow: var(--shadow-lg) !important;
@@ -499,6 +525,7 @@ mat-error,
 
 .hover-glow {
   transition: var(--transition-smooth) !important;
+
   &:hover {
     box-shadow: 0 10px 20px rgba(5, 150, 105, 0.12) !important;
     border-color: rgba(5, 150, 105, 0.25) !important;
@@ -507,6 +534,7 @@ mat-error,
 
 .hover-btn-pulse {
   transition: var(--transition-smooth) !important;
+
   &:hover {
     animation: pulseGlow 1.5s infinite;
     transform: translateY(-1px);

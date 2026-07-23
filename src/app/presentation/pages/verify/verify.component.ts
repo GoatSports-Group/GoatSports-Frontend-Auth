@@ -4,12 +4,13 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { AuthService } from '@presentation/services/auth.service';
+import { environment } from "@environments/environment"
 
 @Component({
-    selector: 'app-verify',
-    templateUrl: './verify.component.html',
-    styleUrls: ['./verify.component.scss'],
-    standalone: false
+  selector: 'app-verify',
+  templateUrl: './verify.component.html',
+  styleUrls: ['./verify.component.scss'],
+  standalone: false
 })
 export class VerifyComponent implements OnInit, OnDestroy {
   private fb = inject(FormBuilder);
@@ -162,6 +163,6 @@ export class VerifyComponent implements OnInit, OnDestroy {
   }
 
   navigateToHome() {
-    window.location.href = import.meta.env.NG_APP_CLIENT_API_URL;
+    window.location.href = environment.clientApiUrl;
   }
 }

@@ -4,12 +4,13 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { AuthService } from '@presentation/services/auth.service';
+import { environment } from "@environments/environment";
 
 @Component({
-    selector: 'app-sign-in',
-    templateUrl: './sign-in.component.html',
-    styleUrls: ['./sign-in.component.scss'],
-    standalone: false
+  selector: 'app-sign-in',
+  templateUrl: './sign-in.component.html',
+  styleUrls: ['./sign-in.component.scss'],
+  standalone: false
 })
 export class SignInComponent implements OnInit {
   private fb = inject(FormBuilder);
@@ -35,13 +36,13 @@ export class SignInComponent implements OnInit {
         const isAdmin = roleName === 'ADMIN';
 
         if (isAdmin) {
-          window.location.href = `${import.meta.env.NG_APP_ADMIN_API_URL}`;
+          window.location.href = environment.adminApiUrl;
         } else {
           const redirectUrl = this.route.snapshot.queryParams['redirect'];
           if (redirectUrl) {
             window.location.href = redirectUrl;
           } else {
-            window.location.href = import.meta.env.NG_APP_CLIENT_API_URL;
+            window.location.href = environment.clientApiUrl;
           }
         }
       }
@@ -78,14 +79,14 @@ export class SignInComponent implements OnInit {
             if (redirectUrl && redirectUrl.includes('localhost:4300')) {
               window.location.href = redirectUrl;
             } else {
-              window.location.href = `${import.meta.env.NG_APP_ADMIN_API_URL}/admin`;
+              window.location.href = `${environment.adminApiUrl}/admin`;
             }
           } else {
             const redirectUrl = this.route.snapshot.queryParams['redirect'];
             if (redirectUrl) {
               window.location.href = redirectUrl;
             } else {
-              window.location.href = import.meta.env.NG_APP_CLIENT_API_URL;
+              window.location.href = environment.clientApiUrl;
             }
           }
         });
@@ -104,7 +105,7 @@ export class SignInComponent implements OnInit {
   }
 
   navigateToHome() {
-    window.location.href = import.meta.env.NG_APP_CLIENT_API_URL;
+    window.location.href = environment.clientApiUrl;
   }
 
   navigateToSignUp() {
@@ -116,13 +117,13 @@ export class SignInComponent implements OnInit {
   }
 
   loginWithGoogle() {
-    const keycloakUrl = import.meta.env.NG_APP_KEYCLOAK_URL;
-    const callbackUrl = import.meta.env.NG_APP_BACKEND_CALLBACK_URL;
-    const realm = import.meta.env.NG_APP_KEYCLOAK_REALM;
-    const clientId = import.meta.env.NG_APP_KEYCLOAK_CLIENT_ID;
+    const keycloakUrl = environment.keycloak.url;
+    const realm = environment.keycloak.realm;
+    const clientId = environment.keycloak.clientId;
+    const callbackUrl = environment.backendCallbackUrl;
 
     const redirectUrlParam = this.route.snapshot.queryParams['redirect'];
-    const frontendRedirectTarget = redirectUrlParam || import.meta.env.NG_APP_CLIENT_API_URL;
+    const frontendRedirectTarget = redirectUrlParam || environment.clientApiUrl;
 
     const authUrl = `${keycloakUrl}/realms/${realm}/protocol/openid-connect/auth`
       + `?client_id=${encodeURIComponent(clientId)}`
