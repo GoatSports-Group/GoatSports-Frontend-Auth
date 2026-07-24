@@ -27,6 +27,19 @@
     animation: marquee-left-to-right 10s linear infinite;
     will-change: transform;
   }
+
+  .animate-marquee-ltr img {
+    position: relative;
+    opacity: 0.15;
+    pointer-events: auto;
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .animate-marquee-ltr img:hover {
+    opacity: 0.9;
+    transform: scale(1.08);
+    z-index: 10;
+  }
 </style>
 
 <div
@@ -35,7 +48,7 @@
   <!-- Interactive 3D perspective grid canvas -->
   <canvas id="auth-canvas" class="absolute inset-0 w-full h-full pointer-events-none opacity-80 z-0"></canvas>
 
-  <div class="absolute inset-0 w-full h-full pointer-events-none z-0 flex items-center overflow-hidden opacity-15">
+  <div class="absolute inset-0 w-full h-full pointer-events-none z-0 flex items-center overflow-hidden">
     <div class="animate-marquee-ltr flex items-center">
       <!-- BỘ ẢNH LẦN 1 -->
       <div class="flex items-center gap-6 sm:gap-10 pr-6 sm:pr-10 flex-shrink-0">
