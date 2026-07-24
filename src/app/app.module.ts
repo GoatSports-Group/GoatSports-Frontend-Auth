@@ -11,6 +11,8 @@ import { IMAGE_CONFIG } from '@angular/common';
 import { AUTH_REPOSITORY_TOKEN } from '@application/ports/auth.repository';
 import { AuthRepositoryImpl } from '@infrastructure/repositories/auth.repository.impl';
 
+import { LucideAngularModule, icons } from 'lucide-angular';
+
 @NgModule({
   declarations: [
     AppComponent
@@ -21,7 +23,8 @@ import { AuthRepositoryImpl } from '@infrastructure/repositories/auth.repository
     FormsModule,
     AppRoutingModule,
     BrowserAnimationsModule,
-    AuthModule
+    AuthModule,
+    LucideAngularModule.pick(icons)
   ],
   providers: [
     { provide: AUTH_REPOSITORY_TOKEN, useClass: AuthRepositoryImpl },

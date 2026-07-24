@@ -1,70 +1,94 @@
-<div class="auth-card-container">
-  <mat-card class="mat-elevation-z0 auth-card animate-slide-up">
-    @if (loading) {
-      <div class="loading-progress-bar"></div>
-    }
+<div
+  class="w-full bg-white/75 backdrop-blur-xl border border-white/60 shadow-[0_24px_60px_rgba(15,23,42,0.04)] rounded-[28px] p-4 sm:p-6 relative overflow-hidden max-sm:border-0 max-sm:shadow-none max-sm:bg-transparent max-sm:p-2">
 
-    <mat-card-header class="auth-card-header">
-      <a (click)="navigateToHome()" class="header-logo">
-        <img src="assets/images/goat.png" alt="Goat Sports Logo" class="logo-img">
-        <h2 class="logo-title">GOAT <span class="logo-accent">Sports</span></h2>
-      </a>
-      <mat-card-title class="auth-title">Nhập mã xác thực</mat-card-title>
-      <mat-card-subtitle class="auth-subtitle">Chúng tôi đã gửi mã 6 chữ số đến email của bạn.</mat-card-subtitle>
-    </mat-card-header>
+  <!-- Sweep Loading Bar -->
+  @if (loading()) {
+  <div
+    class="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-emerald-500 via-teal-500 to-emerald-500 bg-[length:200%_100%] animate-[loadingBarSweep_1.5s_linear_infinite]">
+  </div>
+  }
 
-    <mat-card-content class="auth-card-content">
-      <form [formGroup]="verifyForm" (ngSubmit)="verify()" class="auth-form align-center">
+  <!-- Header Title -->
+  <div class="flex flex-col items-center text-center mb-8">
+    <h2 class="text-3xl font-black text-emerald-600 tracking-tight uppercase font-sports-display mb-2">Nhập mã xác thực
+    </h2>
+    <p class="text-[14px] font-bold text-slate-500 font-sports-body">Chúng tôi đã gửi mã 6 chữ số đến email của bạn.</p>
+  </div>
 
-        <!-- Email Field -->
-        <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Email</mat-label>
-          <input matInput type="email" formControlName="email" placeholder="example@gmail.com" required readonly>
-          <mat-icon matPrefix>email</mat-icon>
-          @if (verifyForm.get('email')?.hasError('required')) {
-            <mat-error>Email không được để trống</mat-error>
-          }
-          @if (verifyForm.get('email')?.hasError('email')) {
-            <mat-error>Email không đúng định dạng</mat-error>
-          }
-        </mat-form-field>
+  <!-- Form Content -->
+  <div class="space-y-6 font-sports-body">
+    <form [formGroup]="verifyForm" (ngSubmit)="verify()" class="space-y-5 flex flex-col items-center">
 
-        <label class="otp-label-desc">Mã xác thực</label>
-        <div class="otp-inputs-container">
+      <!-- Email Field (Read only style) -->
+      <div class="space-y-1.5 w-full text-left">
+        <label class="block text-[13px] font-extrabold uppercase tracking-wide text-slate-700 font-sports-display">Email
+          nhận mã</label>
+        <div class="relative">
+          <span
+            class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none z-10 text-slate-500 group-focus-within:text-emerald-600 transition-colors duration-200">
+            <lucide-icon name="mail" class="w-5 h-5 block"></lucide-icon>
+          </span>
+          <input type="email" formControlName="email" readonly
+            class="w-full pl-11.5 pr-4 py-3.5 rounded-2xl border border-slate-300 bg-slate-100 text-slate-500 font-bold text-[15px] focus:outline-none cursor-not-allowed shadow-inner"
+            placeholder="example@gmail.com">
+        </div>
+      </div>
+
+      <!-- OTP Label and inputs -->
+      <div class="w-full text-left space-y-2.5">
+        <label class="block text-[13px] font-extrabold uppercase tracking-wide text-slate-700 font-sports-display">Mã
+          xác thực OTP</label>
+        <div class="flex justify-between gap-2.5 my-1 w-full">
           @for (digit of [0, 1, 2, 3, 4, 5]; track $index) {
-            <input type="text" maxlength="1" class="otp-digit-input" [(ngModel)]="otp[$index]"
-              [ngModelOptions]="{standalone: true}" (keyup)="onOtpKeyUp($event, $index)"
-              (keydown)="onOtpKeyDown($event, $index)" pattern="\d*">
+          <input type="text" maxlength="1"
+            class="w-11 h-11 sm:w-13 sm:h-13 text-center font-black text-xl text-slate-900 border border-slate-300 bg-white/60 backdrop-blur-md focus:bg-white rounded-2xl focus:outline-none focus:ring-4 focus:ring-emerald-500/5 focus:border-emerald-500 transition-all duration-300 hover:border-slate-400"
+            [value]="otp()[$index]" (input)="onOtpInput($event, $index)" (keydown)="onOtpKeyDown($event, $index)"
+            pattern="\d*">
           }
         </div>
+      </div>
 
-        <button mat-flat-button color="primary" type="submit" [disabled]="!isOtpComplete || loading" class="full-width submit-btn margin-top-md">
-          @if (loading) {
-            <div class="spinner-btn-wrapper">
-              <span class="btn-loading-text">Đang xác thực</span>
-              <span class="dots-loading"></span>
-            </div>
-          } @else {
-            <span>Xác Thực</span>
-          }
-        </button>
+      <!-- Submit Button -->
+      <button type="submit" [disabled]="!isOtpComplete() || loading()"
+        class="w-full py-3.5 mt-3 rounded-2xl font-sports-display font-extrabold text-[15px] tracking-wide uppercase text-white shadow-md shadow-emerald-650/10 bg-emerald-600 hover:bg-emerald-700 hover:shadow-lg hover:shadow-emerald-600/20 transition-all duration-300 active:scale-[0.99] disabled:opacity-50 disabled:pointer-events-none disabled:shadow-none focus:outline-none cursor-pointer">
+        @if (loading()) {
+        <span class="flex items-center justify-center gap-2">
+          <svg class="animate-spin h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor"
+              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+            </path>
+          </svg>
+          <span>Đang xác thực...</span>
+        </span>
+        } @else {
+        <span>Xác Thực</span>
+        }
+      </button>
 
-        <p class="resend-text">
-          Không nhận được mã?
-          @if (countdown > 0) {
-            <span class="resend-disabled">Gửi Lại sau <strong>{{ countdown }}s</strong></span>
-          } @else {
-            <a (click)="resendCode()" class="resend-link animate-pulse-glow">Gửi Lại Mã</a>
-          }
-        </p>
-
-      </form>
-    </mat-card-content>
-
-    <mat-card-footer class="auth-card-footer">
-      <p class="footer-link-text">
-        Quay lại trang <a (click)="navigateToSignIn()" class="auth-link">Đăng nhập</a>
+      <!-- Countdown / Resend -->
+      <p class="text-[14px] font-bold text-slate-500 mt-4 text-center">
+        Không nhận được mã?
+        @if (countdown() > 0) {
+        <span class="text-slate-500 font-bold">Gửi lại sau <strong class="text-slate-700 font-extrabold ml-1">{{
+            countdown() }}s</strong></span>
+        } @else {
+        <a (click)="resendCode()"
+          class="font-extrabold text-emerald-600 hover:underline cursor-pointer transition-colors duration-200 animate-pulse">Gửi
+          Lại Mã</a>
+        }
       </p>
-    </mat-card-footer>
-  </mat-card>
+
+    </form>
+  </div>
+
+  <!-- Card Footer -->
+  <div class="mt-8 pt-6 border-t border-slate-200 text-center font-sports-body">
+    <p class="text-[14px] font-bold text-slate-500">
+      Quay lại trang <a (click)="navigateToSignIn()"
+        class="font-extrabold text-emerald-600 hover:text-emerald-700 hover:underline cursor-pointer transition-colors">Đăng
+        nhập</a>
+    </p>
+  </div>
+
 </div>

@@ -1,9 +1,11 @@
-import { Component, OnInit, inject } from '@angular/core';
-import { AbstractControl, FormBuilder, FormGroup, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
-import { Router, ActivatedRoute } from '@angular/router';
+import { Component, OnInit, inject, signal } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { RouterModule, Router, ActivatedRoute } from '@angular/router';
+import { AbstractControl, FormBuilder, FormGroup, ValidationErrors, ValidatorFn, Validators, ReactiveFormsModule } from '@angular/forms';
 import { AuthService } from '@presentation/services/auth.service';
 import { HttpErrorResponse } from '@angular/common/http';
-import { MatSnackBar } from '@angular/material/snack-bar';
+import { ToastService } from '@shared/services/toast.service';
+import { LucideAngularModule } from 'lucide-angular';
 
 export const passwordMatchValidator: ValidatorFn = (control: AbstractControl): ValidationErrors | null => {
   const password = control.get('password');
@@ -25,22 +27,23 @@ export const passwordMatchValidator: ValidatorFn = (control: AbstractControl): V
 };
 
 @Component({
-    selector: 'app-sign-up',
-    templateUrl: './sign-up.component.html',
-    styleUrls: ['./sign-up.component.scss'],
-    standalone: false
+  selector: 'app-sign-up',
+  templateUrl: './sign-up.component.html',
+  standalone: true,
+  imports: [CommonModule, RouterModule, ReactiveFormsModule, LucideAngularModule]
 })
 export class SignUpComponent implements OnInit {
   private fb = inject(FormBuilder);
   private authService = inject(AuthService);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
-  private snackBar = inject(MatSnackBar);
+  private toastService = inject(ToastService);
 
   signUpForm!: FormGroup;
-  loading = false;
-  hidePassword = true;
-  hideConfirmPassword = true;
+  loading = signal(false);
+  hidePassword = signal(true);
+  hideConfirmPassword = signal(true);
+  passwordStrength = signal<number>(0);
 
   ngOnInit() {
     this.signUpForm = this.fb.group({
@@ -50,12 +53,27 @@ export class SignUpComponent implements OnInit {
       password: ['', [Validators.required, Validators.pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/)]],
       confirmPassword: ['', [Validators.required]]
     }, { validators: passwordMatchValidator });
+
+    // Track password changes to calculate password strength
+    this.signUpForm.get('password')?.valueChanges.subscribe(pwd => {
+      this.passwordStrength.set(this.checkPasswordStrength(pwd || ''));
+    });
+  }
+
+  checkPasswordStrength(pwd: string): number {
+    let score = 0;
+    if (!pwd) return 0;
+    if (pwd.length >= 8) score++;
+    if (/[A-Z]/.test(pwd)) score++;
+    if (/[0-9]/.test(pwd)) score++;
+    if (/[^A-Za-z0-9]/.test(pwd)) score++;
+    return score;
   }
 
   register() {
     if (this.signUpForm.invalid) return;
 
-    this.loading = true;
+    this.loading.set(true);
 
     const payload = {
       username: this.signUpForm.value.username.trim(),
@@ -69,28 +87,17 @@ export class SignUpComponent implements OnInit {
 
     this.authService.register(payload).subscribe({
       next: () => {
-        this.loading = false;
-
-        this.snackBar.open(`Đăng ký thành công tài khoản ${payload.username}! Vui lòng xác thực email.`, 'Đóng', {
-          duration: 4000,
-          horizontalPosition: 'end',
-          verticalPosition: 'top',
-          panelClass: ['snackbar-success']
-        });
+        this.loading.set(false);
+        this.toastService.show(`Đăng ký thành công tài khoản ${payload.username}! Vui lòng xác thực email.`, 'success');
 
         setTimeout(() => {
           this.router.navigate(['/verify'], { queryParams: { email: targetEmail }, queryParamsHandling: 'merge' });
         }, 1500);
       },
       error: (err: HttpErrorResponse) => {
-        this.loading = false;
+        this.loading.set(false);
         const errorMsg = err.error?.message || 'Đăng ký thất bại. Vui lòng thử lại!';
-        this.snackBar.open(errorMsg, 'Đóng', {
-          duration: 4000,
-          horizontalPosition: 'end',
-          verticalPosition: 'top',
-          panelClass: ['snackbar-error']
-        });
+        this.toastService.show(errorMsg, 'error');
       }
     });
   }

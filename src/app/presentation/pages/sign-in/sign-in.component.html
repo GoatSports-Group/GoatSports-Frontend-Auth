@@ -1,90 +1,154 @@
-<div class="auth-card-container">
-  <mat-card class="mat-elevation-z0 auth-card animate-slide-up">
-    @if (loading) {
-    <div class="loading-progress-bar"></div>
-    }
+<div
+  class="w-full bg-white/75 backdrop-blur-xl border border-white/60 shadow-[0_24px_60px_rgba(15,23,42,0.04)] rounded-[28px] p-4 sm:p-6 relative overflow-hidden max-sm:border-0 max-sm:shadow-none max-sm:bg-transparent max-sm:p-2">
 
-    <mat-card-header class="auth-card-header">
-      <a (click)="navigateToHome()" class="header-logo">
-        <img src="assets/images/goat.png" alt="Goat Sports Logo" class="logo-img">
-        <h2 class="logo-title">GOAT <span class="logo-accent">Sports</span></h2>
-      </a>
-      <mat-card-title class="auth-title">Đăng Nhập</mat-card-title>
-      <mat-card-subtitle class="auth-subtitle">Chào mừng bạn! Hãy đăng nhập để tiếp tục</mat-card-subtitle>
-    </mat-card-header>
+  <!-- Premium Sweep Loading Bar -->
+  @if (loading()) {
+  <div
+    class="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-emerald-500 via-teal-500 to-emerald-500 bg-[length:200%_100%] animate-[loadingBarSweep_1.5s_linear_infinite]">
+  </div>
+  }
 
-    <mat-card-content class="auth-card-content">
-      <form [formGroup]="loginForm" (ngSubmit)="login()" class="auth-form">
+  <!-- Header Title -->
+  <div class="flex flex-col items-center text-center mb-8">
+    <h2 class="text-3xl font-black text-emerald-600 tracking-tight uppercase font-sports-display mb-2">Đăng Nhập</h2>
+    <p class="text-[14px] font-bold text-slate-500 font-sports-body">Kết nối cộng đồng thể thao và đặt sân nhanh chóng
+    </p>
+  </div>
 
-        <!-- Username Field -->
-        <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Tên đăng nhập hoặc Email</mat-label>
-          <input matInput type="text" formControlName="username" placeholder="Nhập username hoặc email" required>
-          <mat-icon matPrefix>person</mat-icon>
-          @if (loginForm.get('username')?.hasError('required')) {
-          <mat-error>Tên đăng nhập không được để trống</mat-error>
-          }
-        </mat-form-field>
+  <!-- Content Section -->
+  <div class="space-y-6 font-sports-body">
 
-        <!-- Password Field -->
-        <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Mật khẩu</mat-label>
-          <input matInput [type]="hidePassword ? 'password' : 'text'" formControlName="password" placeholder="••••••••"
-            required>
-          <mat-icon matPrefix>lock</mat-icon>
-          <button mat-icon-button matSuffix (click)="hidePassword = !hidePassword" type="button"
-            aria-label="Toggle password visibility" class="password-toggle-btn">
-            <mat-icon>{{ hidePassword ? 'visibility_off' : 'visibility' }}</mat-icon>
-          </button>
-          @if (loginForm.get('password')?.hasError('required')) {
-          <mat-error>Mật khẩu không được để trống</mat-error>
-          }
-          @if (loginForm.get('password')?.hasError('pattern')) {
-          <mat-error>Mật khẩu phải có ít nhất 8 ký tự</mat-error>
-          }
-        </mat-form-field>
-
-        <!-- Forgot Password Link -->
-        <div class="forgot-pwd-wrapper">
-          <a (click)="navigateToForgotPassword()" class="forgot-link">Quên mật khẩu?</a>
-        </div>
-
-        <!-- Action Button -->
-        <button mat-flat-button color="primary" type="submit" [disabled]="loginForm.invalid || loading"
-          class="full-width submit-btn">
-          @if (loading) {
-          <div class="spinner-btn-wrapper">
-            <span class="btn-loading-text">Đang đăng nhập</span>
-            <span class="dots-loading"></span>
-          </div>
-          } @else {
-          <span>Đăng Nhập</span>
-          }
-        </button>
-
-      </form>
-
-      <!-- Divider -->
-      <div class="divider">
-        <span class="divider-text">hoặc</span>
-      </div>
-
-      <!-- Google Login Button -->
-      <button mat-stroked-button type="button" class="full-width keycloak-btn" (click)="loginWithGoogle()">
-        <svg class="keycloak-svg-icon" viewBox="0 0 24 24">
-          <path d="M21.35,11.1H12v2.7h5.38c-0.24,1.28 -0.96,2.37 -2.04,3.1v2.58h3.3c1.93,-1.78 3.04,-4.4 3.04,-7.4C21.68,11.83 21.56,11.41 21.35,11.1z" fill="#4285F4" />
-          <path d="M12,20.6c2.43,0 4.47,-0.8 5.96,-2.18l-3.3,-2.58c-0.9,0.6 -2.07,0.98 -3.3,0.98 -2.34,0 -4.33,-1.58 -5.03,-3.7H2.92v2.66C4.4,18.66 8.0,20.6 12,20.6z" fill="#34A853" />
-          <path d="M6.97,13.12c-0.18,-0.54 -0.28,-1.11 -0.28,-1.7c0,-0.59 0.1,-1.16 0.28,-1.7V7.06H2.92c-0.62,1.24 -0.97,2.64 -0.97,4.12c0,1.48 0.35,2.88 0.97,4.12l4.05,-3.18z" fill="#FBBC05" />
-          <path d="M12,6.18c1.32,0 2.5,0.45 3.44,1.35l2.58,-2.58C16.46,3.46 14.43,2.6 12,2.6c-4.0,0 -7.6,1.94 -9.08,4.46l4.05,3.18c0.7,-2.12 2.69,-3.7 5.03,-3.7z" fill="#EA4335" />
+    <!-- Social Sign-in — Google only -->
+    <div>
+      <button type="button" (click)="loginWithGoogle()"
+        class="w-full py-3.5 px-4 rounded-2xl border border-slate-300 bg-white/90 backdrop-blur-md hover:bg-slate-50 transition-all duration-200 flex items-center justify-center gap-2.5 font-extrabold text-[16px] tracking-wide text-slate-800 focus:outline-none cursor-pointer">
+        <svg class="w-5 h-5 flex-shrink-0" viewBox="0 0 24 24">
+          <path
+            d="M21.35,11.1H12v2.7h5.38c-0.24,1.28 -0.96,2.37 -2.04,3.1v2.58h3.3c1.93,-1.78 3.04,-4.4 3.04,-7.4C21.68,11.83 21.56,11.41 21.35,11.1z"
+            fill="#4285F4" />
+          <path
+            d="M12,20.6c2.43,0 4.47,-0.8 5.96,-2.18l-3.3,-2.58c-0.9,0.6 -2.07,0.98 -3.3,0.98 -2.34,0 -4.33,-1.58 -5.03,-3.7H2.92v2.66C4.4,18.66 8.0,20.6 12,20.6z"
+            fill="#34A853" />
+          <path
+            d="M6.97,13.12c-0.18,-0.54 -0.28,-1.11 -0.28,-1.7c0,-0.59 0.1,-1.16 0.28,-1.7V7.06H2.92c-0.62,1.24 -0.97,2.64 -0.97,4.12c0,1.48 0.35,2.88 0.97,4.12l4.05,-3.18z"
+            fill="#FBBC05" />
+          <path
+            d="M12,6.18c1.32,0 2.5,0.45 3.44,1.35l2.58,-2.58C16.46,3.46 14.43,2.6 12,2.6c-4.0,0 -7.6,1.94 -9.08,4.46l4.05,3.18c0.7,-2.12 2.69,-3.7 5.03,-3.7z"
+            fill="#EA4335" />
         </svg>
         Đăng nhập với Google
       </button>
-    </mat-card-content>
+    </div>
 
-    <mat-card-footer class="auth-card-footer">
-      <p class="footer-link-text">
-        Chưa có tài khoản? <a (click)="navigateToSignUp()" class="auth-link">Đăng ký ngay</a>
-      </p>
-    </mat-card-footer>
-  </mat-card>
+    <!-- Elegant text divider -->
+    <div class="flex items-center text-center my-6">
+      <div class="flex-1 border-b border-slate-200/60"></div>
+      <span class="mx-4 text-[11px] font-extrabold uppercase tracking-widest text-slate-500 font-sports-display">hoặc sử
+        dụng email</span>
+      <div class="flex-1 border-b border-slate-200/60"></div>
+    </div>
+
+    <form [formGroup]="loginForm" (ngSubmit)="login()" class="space-y-5">
+
+      <!-- Username Field -->
+      <div class="space-y-1.5 w-full">
+        <div class="flex justify-between items-center h-4">
+          <label class="block text-[13px] font-extrabold uppercase tracking-wide text-slate-700 font-sports-display">Tên
+            đăng nhập / Email</label>
+          @if (loginForm.get('username')?.touched && loginForm.get('username')?.hasError('required')) {
+          <span
+            class="text-[11px] font-extrabold text-rose-600 flex items-center gap-1 animate-fade-in uppercase font-sports-display tracking-wider">
+            Bắt buộc
+          </span>
+          }
+        </div>
+        <div class="relative group">
+          <span
+            class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none z-10 text-slate-500 group-focus-within:text-emerald-600 transition-colors duration-200">
+            <lucide-icon name="user" class="w-5 h-5 block"></lucide-icon>
+          </span>
+          <input type="text" formControlName="username" required autocomplete="username"
+            [class.border-rose-350]="loginForm.get('username')?.touched && loginForm.get('username')?.invalid"
+            class="w-full pl-11.5 pr-4 py-3.5 rounded-2xl border border-slate-300 bg-white/60 backdrop-blur-md focus:bg-white focus:outline-none focus:ring-4 focus:ring-emerald-500/5 focus:border-emerald-500 text-[15px] font-bold text-slate-900 placeholder-slate-500 transition-all duration-300 hover:border-slate-400"
+            placeholder="Username hoặc email">
+        </div>
+      </div>
+
+      <!-- Password Field -->
+      <div class="space-y-1.5 w-full">
+        <div class="flex justify-between items-center h-4">
+          <label class="block text-[13px] font-extrabold uppercase tracking-wide text-slate-700 font-sports-display">Mật
+            khẩu</label>
+          @if (loginForm.get('password')?.touched && (loginForm.get('password')?.hasError('required') ||
+          loginForm.get('password')?.hasError('pattern'))) {
+          <span
+            class="text-[11px] font-extrabold text-rose-600 flex items-center gap-1 animate-fade-in uppercase font-sports-display tracking-wider">
+            Mật khẩu chưa đúng
+          </span>
+          }
+        </div>
+        <div class="relative group">
+          <span
+            class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none z-10 text-slate-500 group-focus-within:text-emerald-600 transition-colors duration-200">
+            <lucide-icon name="lock" class="w-5 h-5 block"></lucide-icon>
+          </span>
+          <input [type]="hidePassword() ? 'password' : 'text'" formControlName="password" required
+            autocomplete="current-password"
+            [class.border-rose-350]="loginForm.get('password')?.touched && loginForm.get('password')?.invalid"
+            class="w-full pl-11.5 pr-11 py-3.5 rounded-2xl border border-slate-300 bg-white/60 backdrop-blur-md focus:bg-white focus:outline-none focus:ring-4 focus:ring-emerald-500/5 focus:border-emerald-500 text-[15px] font-bold text-slate-900 placeholder-slate-500 transition-all duration-300 hover:border-slate-400"
+            placeholder="••••••••">
+          <button type="button" (click)="hidePassword.set(!hidePassword())"
+            class="absolute inset-y-0 right-0 pr-4 flex items-center text-slate-600 hover:text-slate-800 transition-colors focus:outline-none cursor-pointer">
+            @if (hidePassword()) {
+            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l18 18" />
+            </svg>
+            } @else {
+            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+            </svg>
+            }
+          </button>
+        </div>
+        <!-- Forgot Password — directly below password, right-aligned -->
+        <div class="flex justify-end pt-1">
+          <a (click)="navigateToForgotPassword()"
+            class="text-[14px] font-extrabold text-slate-500 hover:text-emerald-600 hover:underline cursor-pointer transition-all duration-200">Quên
+            mật khẩu?</a>
+        </div>
+      </div>
+
+      <!-- Submit Button -->
+      <button type="submit" [disabled]="loginForm.invalid || loading()"
+        class="w-full py-3.5 rounded-2xl font-sports-display font-extrabold text-[15px] tracking-wide uppercase text-white shadow-md shadow-emerald-650/10 bg-emerald-600 hover:bg-emerald-700 hover:shadow-lg hover:shadow-emerald-600/20 transition-all duration-300 active:scale-[0.99] disabled:opacity-50 disabled:pointer-events-none disabled:shadow-none focus:outline-none cursor-pointer">
+        @if (loading()) {
+        <span class="flex items-center justify-center gap-2">
+          <svg class="animate-spin h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor"
+              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+            </path>
+          </svg>
+          <span>Đang đăng nhập...</span>
+        </span>
+        } @else {
+        <span>Đăng Nhập</span>
+        }
+      </button>
+
+    </form>
+  </div>
+
+  <!-- Card Footer -->
+  <div class="mt-8 pt-6 border-t border-slate-200 text-center font-sports-body">
+    <p class="text-[14px] font-bold text-slate-500">
+      Chưa có tài khoản? <a (click)="navigateToSignUp()"
+        class="font-extrabold text-emerald-600 hover:text-emerald-700 hover:underline cursor-pointer transition-colors">Đăng
+        ký ngay</a>
+    </p>
+  </div>
+
 </div>

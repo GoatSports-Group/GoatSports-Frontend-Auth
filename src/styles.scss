@@ -3,6 +3,29 @@
 @use 'material-icons/iconfont/material-icons.scss';
 @use "tailwindcss";
 
+@theme {
+  --color-primary: #059669;
+  --color-primary-hover: #047857;
+  --color-primary-light: #f0fdf4;
+
+  --color-accent: #0ea5e9;
+  --color-accent-hover: #0284c7;
+  --color-accent-light: #f0f9ff;
+
+  --color-success: #10b981;
+  --color-warning: #f59e0b;
+  --color-danger: #ef4444;
+  --color-info: #06b6d4;
+
+  --color-text-dark: #0f172a;
+  --color-text-muted: #64748b;
+  --color-text-light: #ffffff;
+
+  --color-bg-body: #f8fafc;
+  --color-bg-card: #ffffff;
+  --color-border-color: #cbd5e1;
+}
+
 /* Import Fonts */
 @font-face {
   font-family: 'Be Vietnam Pro';
@@ -177,45 +200,47 @@
 }
 
 /* Reset and base styles */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
+@layer base {
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
 
-body {
-  background-color: var(--bg-body) !important;
-  color: var(--text-dark) !important;
-  font-family: var(--font-body) !important;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  overflow-x: hidden;
-}
+  body {
+    background-color: var(--bg-body) !important;
+    color: var(--text-dark) !important;
+    font-family: var(--font-body) !important;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
 
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
-  font-family: var(--font-heading);
-  font-weight: 700;
-  color: var(--text-dark);
-  margin-bottom: 0.5rem;
-}
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: var(--font-heading);
+    font-weight: 700;
+    color: var(--text-dark);
+    margin-bottom: 0.5rem;
+  }
 
-p {
-  line-height: 1.6;
-}
+  p {
+    line-height: 1.6;
+  }
 
-a {
-  color: var(--primary);
-  text-decoration: none;
-  transition: var(--transition-smooth);
+  a {
+    color: var(--primary);
+    text-decoration: none;
+    transition: var(--transition-smooth);
 
-  &:hover {
-    color: var(--primary-hover);
+    &:hover {
+      color: var(--primary-hover);
+    }
   }
 }
 

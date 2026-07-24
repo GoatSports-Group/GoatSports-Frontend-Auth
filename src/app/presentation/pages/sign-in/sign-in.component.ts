@@ -1,27 +1,29 @@
-import { Component, OnInit, inject } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Router, ActivatedRoute } from '@angular/router';
+import { Component, OnInit, inject, signal } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { RouterModule, Router, ActivatedRoute } from '@angular/router';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { HttpErrorResponse } from '@angular/common/http';
-import { MatSnackBar } from '@angular/material/snack-bar';
+import { ToastService } from '@shared/services/toast.service';
 import { AuthService } from '@presentation/services/auth.service';
 import { environment } from "@environments/environment";
+import { LucideAngularModule } from 'lucide-angular';
 
 @Component({
   selector: 'app-sign-in',
   templateUrl: './sign-in.component.html',
-  styleUrls: ['./sign-in.component.scss'],
-  standalone: false
+  standalone: true,
+  imports: [CommonModule, RouterModule, ReactiveFormsModule, LucideAngularModule]
 })
 export class SignInComponent implements OnInit {
   private fb = inject(FormBuilder);
   private authService = inject(AuthService);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
-  private snackBar = inject(MatSnackBar);
+  private toastService = inject(ToastService);
 
   loginForm!: FormGroup;
-  loading = false;
-  hidePassword = true;
+  loading = signal(false);
+  hidePassword = signal(true);
 
   ngOnInit() {
     this.loginForm = this.fb.group({
@@ -52,7 +54,7 @@ export class SignInComponent implements OnInit {
   login() {
     if (this.loginForm.invalid) return;
 
-    this.loading = true;
+    this.loading.set(true);
 
     const payload = {
       username: this.loginForm.value.username.trim(),
@@ -61,16 +63,10 @@ export class SignInComponent implements OnInit {
 
     this.authService.login(payload).subscribe({
       next: (user) => {
-        this.loading = false;
+        this.loading.set(false);
+        this.toastService.show(`Chào mừng ${user?.fullName || user?.username} đã quay trở lại!`, 'success');
 
-        const snackBarRef = this.snackBar.open(`Chào mừng ${user?.fullName || user?.username} đã quay trở lại!`, 'Đóng', {
-          duration: 1000,
-          horizontalPosition: 'end',
-          verticalPosition: 'top',
-          panelClass: ['snackbar-success']
-        });
-
-        snackBarRef.afterDismissed().subscribe(() => {
+        setTimeout(() => {
           const roleName = (user?.role?.name || '').toUpperCase();
           const isAdmin = roleName === 'ADMIN';
 
@@ -89,17 +85,12 @@ export class SignInComponent implements OnInit {
               window.location.href = environment.clientApiUrl;
             }
           }
-        });
+        }, 1000);
       },
       error: (err: HttpErrorResponse) => {
-        this.loading = false;
+        this.loading.set(false);
         const errorMsg = err.error?.message || 'Đăng nhập thất bại. Vui lòng kiểm tra lại tài khoản!';
-        this.snackBar.open(errorMsg, 'Đóng', {
-          duration: 4000,
-          horizontalPosition: 'end',
-          verticalPosition: 'top',
-          panelClass: ['snackbar-error']
-        });
+        this.toastService.show(errorMsg, 'error');
       }
     });
   }

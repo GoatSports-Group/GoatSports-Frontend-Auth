@@ -1,27 +1,29 @@
-import { Component, inject } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Router, ActivatedRoute } from '@angular/router';
-import { MatSnackBar } from '@angular/material/snack-bar';
+import { Component, inject, signal } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { RouterModule, Router, ActivatedRoute } from '@angular/router';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { HttpErrorResponse } from '@angular/common/http';
+import { ToastService } from '@shared/services/toast.service';
 import { AuthService } from '@presentation/services/auth.service';
+import { LucideAngularModule } from 'lucide-angular';
 
 @Component({
-    selector: 'app-forgot-password',
-    templateUrl: './forgot-password.component.html',
-    styleUrls: ['./forgot-password.component.scss'],
-    standalone: false
+  selector: 'app-forgot-password',
+  templateUrl: './forgot-password.component.html',
+  standalone: true,
+  imports: [CommonModule, RouterModule, ReactiveFormsModule, LucideAngularModule]
 })
 export class ForgotPasswordComponent {
   private fb = inject(FormBuilder);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
-  private snackBar = inject(MatSnackBar);
+  private toastService = inject(ToastService);
   private authService = inject(AuthService);
 
   forgotForm: FormGroup;
-  loading = false;
-  hidePassword = true;
-  hideConfirmPassword = true;
+  loading = signal(false);
+  hidePassword = signal(true);
+  hideConfirmPassword = signal(true);
 
   constructor() {
     this.forgotForm = this.fb.group({
@@ -55,7 +57,7 @@ export class ForgotPasswordComponent {
   onSubmitStep1() {
     if (this.forgotForm.invalid) return;
 
-    this.loading = true;
+    this.loading.set(true);
 
     const email = this.forgotForm.value.email.trim();
     const payload = {
@@ -66,27 +68,17 @@ export class ForgotPasswordComponent {
 
     this.authService.forgotPassword(payload).subscribe({
       next: () => {
-        this.loading = false;
-        this.snackBar.open('Mã xác thực 6 chữ số đã được gửi tới Email của bạn!', 'Đóng', {
-          duration: 1000,
-          horizontalPosition: 'end',
-          verticalPosition: 'top',
-          panelClass: ['snackbar-success']
-        });
+        this.loading.set(false);
+        this.toastService.show('Mã xác thực 6 chữ số đã được gửi tới Email của bạn!', 'success');
 
         setTimeout(() => {
           this.router.navigate(['/verify'], { queryParams: { email: email }, queryParamsHandling: 'merge' });
         }, 1500);
       },
       error: (err: HttpErrorResponse) => {
-        this.loading = false;
+        this.loading.set(false);
         const errorMsg = err.error?.message || 'Có lỗi xảy ra. Vui lòng thử lại!';
-        this.snackBar.open(errorMsg, 'Đóng', {
-          duration: 1000,
-          horizontalPosition: 'end',
-          verticalPosition: 'top',
-          panelClass: ['snackbar-error']
-        });
+        this.toastService.show(errorMsg, 'error');
       }
     });
   }
