@@ -8,6 +8,25 @@
   .font-sports-body {
     font-family: 'Plus Jakarta Sans', sans-serif;
   }
+
+  /* Keyframe cuộn vô tận từ trái qua phải (Left to Right) */
+  @keyframes marquee-left-to-right {
+    0% {
+      transform: translate3d(-50%, 0, 0);
+    }
+
+    100% {
+      transform: translate3d(0%, 0, 0);
+    }
+  }
+
+  .animate-marquee-ltr {
+    display: flex;
+    flex-shrink: 0;
+    width: max-content;
+    animation: marquee-left-to-right 10s linear infinite;
+    will-change: transform;
+  }
 </style>
 
 <div
@@ -15,6 +34,42 @@
 
   <!-- Interactive 3D perspective grid canvas -->
   <canvas id="auth-canvas" class="absolute inset-0 w-full h-full pointer-events-none opacity-80 z-0"></canvas>
+
+  <div class="absolute inset-0 w-full h-full pointer-events-none z-0 flex items-center overflow-hidden opacity-15">
+    <div class="animate-marquee-ltr flex items-center">
+      <!-- BỘ ẢNH LẦN 1 -->
+      <div class="flex items-center gap-6 sm:gap-10 pr-6 sm:pr-10 flex-shrink-0">
+        <img src="assets/images/sports/football.jpg"
+          class="h-44 sm:h-56 w-auto rounded-3xl object-cover contrast-125 shadow-lg" alt="Football">
+        <img src="assets/images/sports/basketball.jpg"
+          class="h-44 sm:h-56 w-auto rounded-3xl object-cover contrast-125 shadow-lg" alt="Basketball">
+        <img src="assets/images/sports/volleyball.jpg"
+          class="h-44 sm:h-56 w-auto rounded-3xl object-cover contrast-125 shadow-lg" alt="Volleyball">
+        <img src="assets/images/sports/badminton.jpg"
+          class="h-44 sm:h-56 w-auto rounded-3xl object-cover contrast-125 shadow-lg" alt="Badminton">
+        <img src="assets/images/sports/tennis.jpg"
+          class="h-44 sm:h-56 w-auto rounded-3xl object-cover contrast-125 shadow-lg" alt="Tennis">
+        <img src="assets/images/sports/table_tennis.jpg"
+          class="h-44 sm:h-56 w-auto rounded-3xl object-cover contrast-125 shadow-lg" alt="Table Tennis">
+      </div>
+
+      <!-- BỘ ẢNH LẦN 2 -->
+      <div class="flex items-center gap-6 sm:gap-10 pr-6 sm:pr-10 flex-shrink-0">
+        <img src="assets/images/sports/football.jpg"
+          class="h-44 sm:h-56 w-auto rounded-3xl object-cover contrast-125 shadow-lg" alt="Football">
+        <img src="assets/images/sports/basketball.jpg"
+          class="h-44 sm:h-56 w-auto rounded-3xl object-cover contrast-125 shadow-lg" alt="Basketball">
+        <img src="assets/images/sports/volleyball.jpg"
+          class="h-44 sm:h-56 w-auto rounded-3xl object-cover contrast-125 shadow-lg" alt="Volleyball">
+        <img src="assets/images/sports/badminton.jpg"
+          class="h-44 sm:h-56 w-auto rounded-3xl object-cover contrast-125 shadow-lg" alt="Badminton">
+        <img src="assets/images/sports/tennis.jpg"
+          class="h-44 sm:h-56 w-auto rounded-3xl object-cover contrast-125 shadow-lg" alt="Tennis">
+        <img src="assets/images/sports/table_tennis.jpg"
+          class="h-44 sm:h-56 w-auto rounded-3xl object-cover contrast-125 shadow-lg" alt="Table Tennis">
+      </div>
+    </div>
+  </div>
 
   <!-- Clean, soft ambient background details for the form area (enriched colors for glassmorphism refraction) -->
   <div
