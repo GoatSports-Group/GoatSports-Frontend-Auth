@@ -6,13 +6,13 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { ToastService } from '@shared/services/toast.service';
 import { AuthService } from '@presentation/services/auth.service';
 import { environment } from "@environments/environment";
-import { LucideAngularModule } from 'lucide-angular';
+import { LucideIconComponent } from '@shared/components/ui/lucide-icon.component';
 
 @Component({
   selector: 'app-sign-in',
   templateUrl: './sign-in.component.html',
   standalone: true,
-  imports: [CommonModule, RouterModule, ReactiveFormsModule, LucideAngularModule]
+  imports: [CommonModule, RouterModule, ReactiveFormsModule, LucideIconComponent]
 })
 export class SignInComponent implements OnInit {
   private fb = inject(FormBuilder);

@@ -6,13 +6,13 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { ToastService } from '@shared/services/toast.service';
 import { AuthService } from '@presentation/services/auth.service';
 import { environment } from "@environments/environment";
-import { LucideAngularModule } from 'lucide-angular';
+import { LucideIconComponent } from '@shared/components/ui/lucide-icon.component';
 
 @Component({
   selector: 'app-verify',
   templateUrl: './verify.component.html',
   standalone: true,
-  imports: [CommonModule, RouterModule, ReactiveFormsModule, LucideAngularModule]
+  imports: [CommonModule, RouterModule, ReactiveFormsModule, LucideIconComponent]
 })
 export class VerifyComponent implements OnInit, OnDestroy {
   private fb = inject(FormBuilder);

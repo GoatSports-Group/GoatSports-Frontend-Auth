@@ -5,13 +5,13 @@ import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angula
 import { HttpErrorResponse } from '@angular/common/http';
 import { ToastService } from '@shared/services/toast.service';
 import { AuthService } from '@presentation/services/auth.service';
-import { LucideAngularModule } from 'lucide-angular';
+import { LucideIconComponent } from '@shared/components/ui/lucide-icon.component';
 
 @Component({
   selector: 'app-forgot-password',
   templateUrl: './forgot-password.component.html',
   standalone: true,
-  imports: [CommonModule, RouterModule, ReactiveFormsModule, LucideAngularModule]
+  imports: [CommonModule, RouterModule, ReactiveFormsModule, LucideIconComponent]
 })
 export class ForgotPasswordComponent {
   private fb = inject(FormBuilder);

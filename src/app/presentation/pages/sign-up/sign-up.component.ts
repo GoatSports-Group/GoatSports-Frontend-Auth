@@ -5,7 +5,7 @@ import { AbstractControl, FormBuilder, FormGroup, ValidationErrors, ValidatorFn,
 import { AuthService } from '@presentation/services/auth.service';
 import { HttpErrorResponse } from '@angular/common/http';
 import { ToastService } from '@shared/services/toast.service';
-import { LucideAngularModule } from 'lucide-angular';
+import { LucideIconComponent } from '@shared/components/ui/lucide-icon.component';
 
 export const passwordMatchValidator: ValidatorFn = (control: AbstractControl): ValidationErrors | null => {
   const password = control.get('password');
@@ -30,7 +30,7 @@ export const passwordMatchValidator: ValidatorFn = (control: AbstractControl): V
   selector: 'app-sign-up',
   templateUrl: './sign-up.component.html',
   standalone: true,
-  imports: [CommonModule, RouterModule, ReactiveFormsModule, LucideAngularModule]
+  imports: [CommonModule, RouterModule, ReactiveFormsModule, LucideIconComponent]
 })
 export class SignUpComponent implements OnInit {
   private fb = inject(FormBuilder);
