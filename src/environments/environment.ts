@@ -6,7 +6,7 @@ export const environment = {
     clientApiUrl: process.env['NG_APP_CLIENT_API_URL'] || "http://localhost:4200",
 
     apiUrl: process.env['NG_APP_API_URL'] || "http://localhost:7070",
-    backendCallbackUrl: process.env['NG_APP_BACKEND_CALLBACK_URL'] || "http://localhost:7071/callback",
+    backendCallbackUrl: process.env['NG_APP_BACKEND_CALLBACK_URL'] || "http://localhost:7070/auth-service/callback",
 
     keycloak: {
         url: process.env['NG_APP_KEYCLOAK_URL'] || "http://localhost:8082",
