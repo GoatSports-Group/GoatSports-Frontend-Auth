@@ -6,13 +6,25 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { ToastService } from '@shared/services/toast.service';
 import { AuthService } from '@presentation/services/auth.service';
 import { environment } from "@environments/environment";
-import { LucideIconComponent } from '@shared/components/ui/lucide-icon.component';
+import { AuthCardComponent } from '@shared/components/auth-card/auth-card.component';
+import { FormFieldComponent } from '@shared/components/form-field/form-field.component';
+import { PasswordInputComponent } from '@shared/components/password-input/password-input.component';
+import { SubmitButtonComponent } from '@shared/components/submit-button/submit-button.component';
+import { PASSWORD_PATTERN } from '@shared/constants/auth.constants';
 
 @Component({
   selector: 'app-sign-in',
   templateUrl: './sign-in.component.html',
   standalone: true,
-  imports: [CommonModule, RouterModule, ReactiveFormsModule, LucideIconComponent]
+  imports: [
+    CommonModule,
+    RouterModule,
+    ReactiveFormsModule,
+    AuthCardComponent,
+    FormFieldComponent,
+    PasswordInputComponent,
+    SubmitButtonComponent
+  ]
 })
 export class SignInComponent implements OnInit {
   private fb = inject(FormBuilder);
@@ -23,12 +35,11 @@ export class SignInComponent implements OnInit {
 
   loginForm!: FormGroup;
   loading = signal(false);
-  hidePassword = signal(true);
 
   ngOnInit() {
     this.loginForm = this.fb.group({
       username: ['', [Validators.required]],
-      password: ['', [Validators.required, Validators.pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/)]]
+      password: ['', [Validators.required, Validators.pattern(PASSWORD_PATTERN)]]
     });
 
     this.authService.sessionReady$.subscribe(ready => {

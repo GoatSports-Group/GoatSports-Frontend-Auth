@@ -1,36 +1,29 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router, ActivatedRoute } from '@angular/router';
-import { AbstractControl, FormBuilder, FormGroup, ValidationErrors, ValidatorFn, Validators, ReactiveFormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { AuthService } from '@presentation/services/auth.service';
 import { HttpErrorResponse } from '@angular/common/http';
 import { ToastService } from '@shared/services/toast.service';
-import { LucideIconComponent } from '@shared/components/ui/lucide-icon.component';
-
-export const passwordMatchValidator: ValidatorFn = (control: AbstractControl): ValidationErrors | null => {
-  const password = control.get('password');
-  const confirmPassword = control.get('confirmPassword');
-
-  if (!password || !confirmPassword) return null;
-
-  if (password.value !== confirmPassword.value) {
-    confirmPassword.setErrors({ ...confirmPassword.errors, passwordMismatch: true });
-    return { passwordMismatch: true };
-  } else {
-    if (confirmPassword.hasError('passwordMismatch')) {
-      const errors = { ...confirmPassword.errors };
-      delete errors['passwordMismatch'];
-      confirmPassword.setErrors(Object.keys(errors).length > 0 ? errors : null);
-    }
-    return null;
-  }
-};
+import { AuthCardComponent } from '@shared/components/auth-card/auth-card.component';
+import { FormFieldComponent } from '@shared/components/form-field/form-field.component';
+import { PasswordInputComponent } from '@shared/components/password-input/password-input.component';
+import { SubmitButtonComponent } from '@shared/components/submit-button/submit-button.component';
+import { PASSWORD_PATTERN } from '@shared/constants/auth.constants';
+import { passwordMatchValidator } from '@shared/validators/password.validators';
 
 @Component({
   selector: 'app-sign-up',
   templateUrl: './sign-up.component.html',
-  standalone: true,
-  imports: [CommonModule, RouterModule, ReactiveFormsModule, LucideIconComponent]
+  imports: [
+    CommonModule,
+    RouterModule,
+    ReactiveFormsModule,
+    AuthCardComponent,
+    FormFieldComponent,
+    PasswordInputComponent,
+    SubmitButtonComponent
+  ]
 })
 export class SignUpComponent implements OnInit {
   private fb = inject(FormBuilder);
@@ -41,8 +34,6 @@ export class SignUpComponent implements OnInit {
 
   signUpForm!: FormGroup;
   loading = signal(false);
-  hidePassword = signal(true);
-  hideConfirmPassword = signal(true);
   passwordStrength = signal<number>(0);
 
   ngOnInit() {
@@ -50,7 +41,7 @@ export class SignUpComponent implements OnInit {
       username: ['', [Validators.required, Validators.minLength(3)]],
       fullName: ['', [Validators.required]],
       email: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required, Validators.pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/)]],
+      password: ['', [Validators.required, Validators.pattern(PASSWORD_PATTERN)]],
       confirmPassword: ['', [Validators.required]]
     }, { validators: passwordMatchValidator });
 

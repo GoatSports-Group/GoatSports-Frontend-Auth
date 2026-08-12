@@ -1,0 +1,39 @@
+.font-sports-display {
+  font-family: 'Be Vietnam Pro', sans-serif;
+}
+
+.font-sports-body {
+  font-family: 'Be Vietnam Pro', sans-serif;
+}
+
+/* Keyframe cuộn vô tận từ trái qua phải (Left to Right) */
+@keyframes marquee-left-to-right {
+  0% {
+    transform: translate3d(-50%, 0, 0);
+  }
+
+  100% {
+    transform: translate3d(0%, 0, 0);
+  }
+}
+
+.animate-marquee-ltr {
+  display: flex;
+  flex-shrink: 0;
+  width: max-content;
+  animation: marquee-left-to-right 30s linear infinite;
+  will-change: transform;
+}
+
+.animate-marquee-ltr img {
+  position: relative;
+  opacity: 0.15;
+  pointer-events: auto;
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.animate-marquee-ltr img:hover {
+  opacity: 0.9;
+  transform: scale(1.08);
+  z-index: 10;
+}

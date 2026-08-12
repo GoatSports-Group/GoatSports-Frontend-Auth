@@ -35,15 +35,15 @@ export class AuthApi {
     );
   }
 
-  forgotPassword(payload: ForgotPasswordRequest): Observable<any> {
-    return this.http.put<any>(
+  forgotPassword(payload: ForgotPasswordRequest): Observable<BaseResponse<void>> {
+    return this.http.put<BaseResponse<void>>(
       `${this.apiBase}/auth-service/api/v1/auth/forgot-password`,
       payload
     );
   }
 
-  resendVerificationCode(email: string): Observable<any> {
-    return this.http.post<any>(
+  resendVerificationCode(email: string): Observable<BaseResponse<void>> {
+    return this.http.post<BaseResponse<void>>(
       `${this.apiBase}/auth-service/api/v1/auth/resend`,
       null,
       { params: { email } }

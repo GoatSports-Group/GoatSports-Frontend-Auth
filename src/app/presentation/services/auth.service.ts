@@ -2,7 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { Observable, tap } from 'rxjs';
 import { Router } from '@angular/router';
 import { SessionStateService } from '@presentation/services/session-state.service';
-import { User } from '@application/dto/user/user.dto';
+import { User } from '@domain/entities/user';
 import { LoginRequest, RegisterRequest, VerificationRequest, ForgotPasswordRequest } from '@application/dto/auth/auth.dto';
 import { LoginUseCase } from '@application/usecase/auth/login.usecase';
 import { RegisterUseCase } from '@application/usecase/auth/register.usecase';

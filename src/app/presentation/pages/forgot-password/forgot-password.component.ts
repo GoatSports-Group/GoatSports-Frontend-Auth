@@ -5,13 +5,26 @@ import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angula
 import { HttpErrorResponse } from '@angular/common/http';
 import { ToastService } from '@shared/services/toast.service';
 import { AuthService } from '@presentation/services/auth.service';
-import { LucideIconComponent } from '@shared/components/ui/lucide-icon.component';
+import { AuthCardComponent } from '@shared/components/auth-card/auth-card.component';
+import { FormFieldComponent } from '@shared/components/form-field/form-field.component';
+import { PasswordInputComponent } from '@shared/components/password-input/password-input.component';
+import { SubmitButtonComponent } from '@shared/components/submit-button/submit-button.component';
+import { PASSWORD_PATTERN } from '@shared/constants/auth.constants';
+import { passwordMatchValidator } from '@shared/validators/password.validators';
 
 @Component({
   selector: 'app-forgot-password',
   templateUrl: './forgot-password.component.html',
   standalone: true,
-  imports: [CommonModule, RouterModule, ReactiveFormsModule, LucideIconComponent]
+  imports: [
+    CommonModule,
+    RouterModule,
+    ReactiveFormsModule,
+    AuthCardComponent,
+    FormFieldComponent,
+    PasswordInputComponent,
+    SubmitButtonComponent
+  ]
 })
 export class ForgotPasswordComponent {
   private fb = inject(FormBuilder);
@@ -22,36 +35,15 @@ export class ForgotPasswordComponent {
 
   forgotForm: FormGroup;
   loading = signal(false);
-  hidePassword = signal(true);
-  hideConfirmPassword = signal(true);
 
   constructor() {
     this.forgotForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required, Validators.pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/)]],
+      password: ['', [Validators.required, Validators.pattern(PASSWORD_PATTERN)]],
       confirmPassword: ['', [Validators.required]]
     }, {
-      validators: this.passwordMatchValidator
+      validators: passwordMatchValidator
     });
-  }
-
-  passwordMatchValidator(g: FormGroup) {
-    const password = g.get('password');
-    const confirmPassword = g.get('confirmPassword');
-
-    if (!password || !confirmPassword) return null;
-
-    if (password.value !== confirmPassword.value) {
-      confirmPassword.setErrors({ ...confirmPassword.errors, mismatch: true });
-      return { mismatch: true };
-    } else {
-      if (confirmPassword.hasError('mismatch')) {
-        const errors = { ...confirmPassword.errors };
-        delete errors['mismatch'];
-        confirmPassword.setErrors(Object.keys(errors).length > 0 ? errors : null);
-      }
-      return null;
-    }
   }
 
   onSubmitStep1() {
