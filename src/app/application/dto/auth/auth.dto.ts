@@ -1,3 +1,5 @@
+export { User } from '@domain/entities/user';
+
 export type LoginRequest = {
   username: string;
   password: string;
