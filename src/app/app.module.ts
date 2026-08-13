@@ -6,6 +6,7 @@ import { AppRoutingModule } from './app-routing.module';
 import { RouterModule } from '@angular/router';
 import { AppComponent } from './app.component';
 import { IMAGE_CONFIG } from '@angular/common';
+import { NotifyComponent } from '@shared/components/notify/notify.component';
 
 import { AUTH_REPOSITORY_TOKEN } from '@application/ports/auth.repository';
 import { AuthRepositoryImpl } from '@infrastructure/repositories/auth.repository.impl';
@@ -26,7 +27,8 @@ import {
     HttpClientModule,
     RouterModule,
     AppRoutingModule,
-    BrowserAnimationsModule
+    BrowserAnimationsModule,
+    NotifyComponent
   ],
   providers: [
     { provide: AUTH_REPOSITORY_TOKEN, useClass: AuthRepositoryImpl },

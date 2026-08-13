@@ -1,26 +1,11 @@
-import { Injectable, signal } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
+import { NotifyService, NotifyType } from '@shared/components/notify/notify.service';
 
-export interface Toast {
-  id: number;
-  message: string;
-  type: 'success' | 'error' | 'info';
-}
-
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable({ providedIn: 'root' })
 export class ToastService {
-  private activeToasts = signal<Toast[]>([]);
-  toasts = this.activeToasts.asReadonly();
-  private nextId = 0;
+  private readonly notify = inject(NotifyService);
 
-  show(message: string, type: 'success' | 'error' | 'info' = 'info', duration = 3000) {
-    const id = this.nextId++;
-    const toast: Toast = { id, message, type };
-    this.activeToasts.update(list => [...list, toast]);
-
-    setTimeout(() => {
-      this.activeToasts.update(list => list.filter(t => t.id !== id));
-    }, duration);
+  show(message: string, type: Exclude<NotifyType, 'warning'> = 'info', _duration = 3000): void {
+    this.notify[type](message);
   }
 }

@@ -1,7 +1,6 @@
 import { Component, AfterViewInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
-import { ToastService } from '@shared/services/toast.service';
 import { environment } from "@environments/environment";
 import { AuthCanvasBackgroundService } from './auth-canvas-background.service';
 
@@ -13,7 +12,6 @@ import { AuthCanvasBackgroundService } from './auth-canvas-background.service';
   imports: [CommonModule, RouterModule]
 })
 export class AuthComponent implements AfterViewInit, OnDestroy {
-  public toastService = inject(ToastService);
   private canvasBackgroundService = inject(AuthCanvasBackgroundService);
 
   navigateToHome() {
