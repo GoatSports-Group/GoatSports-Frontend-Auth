@@ -5,6 +5,7 @@ import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angula
 import { HttpErrorResponse } from '@angular/common/http';
 import { ToastService } from '@shared/services/toast.service';
 import { AuthService } from '@presentation/services/auth.service';
+import { CryptoService } from '@presentation/services/crypto.service';
 import { AuthCardComponent } from '@shared/components/auth-card/auth-card.component';
 import { FormFieldComponent } from '@shared/components/form-field/form-field.component';
 import { PasswordInputComponent } from '@shared/components/password-input/password-input.component';
@@ -32,6 +33,7 @@ export class ForgotPasswordComponent {
   private route = inject(ActivatedRoute);
   private toastService = inject(ToastService);
   private authService = inject(AuthService);
+  private cryptoService = inject(CryptoService);
 
   forgotForm: FormGroup;
   loading = signal(false);
@@ -52,25 +54,39 @@ export class ForgotPasswordComponent {
     this.loading.set(true);
 
     const email = this.forgotForm.value.email.trim();
-    const payload = {
-      email: email,
-      password: this.forgotForm.value.password,
-      confirmPassword: this.forgotForm.value.confirmPassword
-    };
+    const rawPassword = this.forgotForm.value.password;
+    const rawConfirmPassword = this.forgotForm.value.confirmPassword;
 
-    this.authService.forgotPassword(payload).subscribe({
-      next: () => {
-        this.loading.set(false);
-        this.toastService.show('Mã xác thực 6 chữ số đã được gửi tới Email của bạn!', 'success');
+    this.cryptoService.getPublicKey().subscribe({
+      next: (publicKey) => {
+        const encryptedPassword = this.cryptoService.encrypt(rawPassword, publicKey);
+        const encryptedConfirmPassword = this.cryptoService.encrypt(rawConfirmPassword, publicKey);
 
-        setTimeout(() => {
-          this.router.navigate(['/verify'], { queryParams: { email: email }, queryParamsHandling: 'merge' });
-        }, 1500);
+        const payload = {
+          email: email,
+          password: encryptedPassword,
+          confirmPassword: encryptedConfirmPassword
+        };
+
+        this.authService.forgotPassword(payload).subscribe({
+          next: () => {
+            this.loading.set(false);
+            this.toastService.show('Mã xác thực 6 chữ số đã được gửi tới Email của bạn!', 'success');
+
+            setTimeout(() => {
+              this.router.navigate(['/verify'], { queryParams: { email: email }, queryParamsHandling: 'merge' });
+            }, 1500);
+          },
+          error: (err: HttpErrorResponse) => {
+            this.loading.set(false);
+            const errorMsg = err.error?.message || 'Có lỗi xảy ra. Vui lòng thử lại!';
+            this.toastService.show(errorMsg, 'error');
+          }
+        });
       },
-      error: (err: HttpErrorResponse) => {
+      error: (err) => {
         this.loading.set(false);
-        const errorMsg = err.error?.message || 'Có lỗi xảy ra. Vui lòng thử lại!';
-        this.toastService.show(errorMsg, 'error');
+        this.toastService.show('Không thể kết nối bảo mật để mã hóa mật khẩu!', 'error');
       }
     });
   }

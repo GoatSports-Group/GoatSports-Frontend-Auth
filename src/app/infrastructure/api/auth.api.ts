@@ -62,4 +62,10 @@ export class AuthApi {
       `${this.apiBase}/auth-service/api/v1/auth/me`
     );
   }
+
+  getPublicKey(): Observable<BaseResponse<{ publicKey: string }>> {
+    return this.http.get<BaseResponse<{ publicKey: string }>>(
+      `${this.apiBase}/auth-service/api/v1/auth/public-key`
+    );
+  }
 }

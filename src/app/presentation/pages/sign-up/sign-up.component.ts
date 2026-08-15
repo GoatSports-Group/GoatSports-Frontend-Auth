@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterModule, Router, ActivatedRoute } from '@angular/router';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { AuthService } from '@presentation/services/auth.service';
+import { CryptoService } from '@presentation/services/crypto.service';
 import { HttpErrorResponse } from '@angular/common/http';
 import { ToastService } from '@shared/services/toast.service';
 import { AuthCardComponent } from '@shared/components/auth-card/auth-card.component';
@@ -31,6 +32,7 @@ export class SignUpComponent implements OnInit {
   private router = inject(Router);
   private route = inject(ActivatedRoute);
   private toastService = inject(ToastService);
+  private cryptoService = inject(CryptoService);
 
   signUpForm!: FormGroup;
   loading = signal(false);
@@ -66,29 +68,46 @@ export class SignUpComponent implements OnInit {
 
     this.loading.set(true);
 
-    const payload = {
-      username: this.signUpForm.value.username.trim(),
-      fullName: this.signUpForm.value.fullName.trim(),
-      email: this.signUpForm.value.email.trim(),
-      password: this.signUpForm.value.password,
-      confirmPassword: this.signUpForm.value.confirmPassword
-    };
+    const username = this.signUpForm.value.username.trim();
+    const fullName = this.signUpForm.value.fullName.trim();
+    const email = this.signUpForm.value.email.trim();
+    const rawPassword = this.signUpForm.value.password;
+    const rawConfirmPassword = this.signUpForm.value.confirmPassword;
 
-    const targetEmail = payload.email;
+    this.cryptoService.getPublicKey().subscribe({
+      next: (publicKey) => {
+        const encryptedPassword = this.cryptoService.encrypt(rawPassword, publicKey);
+        const encryptedConfirmPassword = this.cryptoService.encrypt(rawConfirmPassword, publicKey);
 
-    this.authService.register(payload).subscribe({
-      next: () => {
-        this.loading.set(false);
-        this.toastService.show(`Đăng ký thành công tài khoản ${payload.username}! Vui lòng xác thực email.`, 'success');
+        const payload = {
+          username: username,
+          fullName: fullName,
+          email: email,
+          password: encryptedPassword,
+          confirmPassword: encryptedConfirmPassword
+        };
 
-        setTimeout(() => {
-          this.router.navigate(['/verify'], { queryParams: { email: targetEmail }, queryParamsHandling: 'merge' });
-        }, 1500);
+        const targetEmail = payload.email;
+
+        this.authService.register(payload).subscribe({
+          next: () => {
+            this.loading.set(false);
+            this.toastService.show(`Đăng ký thành công tài khoản ${payload.username}! Vui lòng xác thực email.`, 'success');
+
+            setTimeout(() => {
+              this.router.navigate(['/verify'], { queryParams: { email: targetEmail }, queryParamsHandling: 'merge' });
+            }, 1500);
+          },
+          error: (err: HttpErrorResponse) => {
+            this.loading.set(false);
+            const errorMsg = err.error?.message || 'Đăng ký thất bại. Vui lòng thử lại!';
+            this.toastService.show(errorMsg, 'error');
+          }
+        });
       },
-      error: (err: HttpErrorResponse) => {
+      error: (err) => {
         this.loading.set(false);
-        const errorMsg = err.error?.message || 'Đăng ký thất bại. Vui lòng thử lại!';
-        this.toastService.show(errorMsg, 'error');
+        this.toastService.show('Không thể kết nối bảo mật để mã hóa mật khẩu!', 'error');
       }
     });
   }

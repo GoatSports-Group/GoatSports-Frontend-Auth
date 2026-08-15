@@ -5,6 +5,7 @@ import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angula
 import { HttpErrorResponse } from '@angular/common/http';
 import { ToastService } from '@shared/services/toast.service';
 import { AuthService } from '@presentation/services/auth.service';
+import { CryptoService } from '@presentation/services/crypto.service';
 import { environment } from "@environments/environment";
 import { AuthCardComponent } from '@shared/components/auth-card/auth-card.component';
 import { FormFieldComponent } from '@shared/components/form-field/form-field.component';
@@ -32,6 +33,7 @@ export class SignInComponent implements OnInit {
   private router = inject(Router);
   private route = inject(ActivatedRoute);
   private toastService = inject(ToastService);
+  private cryptoService = inject(CryptoService);
 
   loginForm!: FormGroup;
   loading = signal(false);
@@ -67,41 +69,54 @@ export class SignInComponent implements OnInit {
 
     this.loading.set(true);
 
-    const payload = {
-      username: this.loginForm.value.username.trim(),
-      password: this.loginForm.value.password
-    };
+    const username = this.loginForm.value.username.trim();
+    const rawPassword = this.loginForm.value.password;
 
-    this.authService.login(payload).subscribe({
-      next: (user) => {
-        this.loading.set(false);
-        this.toastService.show(`Chào mừng ${user?.fullName || user?.username} đã quay trở lại!`, 'success');
+    this.cryptoService.getPublicKey().subscribe({
+      next: (publicKey) => {
+        const encryptedPassword = this.cryptoService.encrypt(rawPassword, publicKey);
 
-        setTimeout(() => {
-          const roleName = (user?.role?.name || '').toUpperCase();
-          const isAdmin = roleName === 'ADMIN';
+        const payload = {
+          username: username,
+          password: encryptedPassword
+        };
 
-          if (isAdmin) {
-            const redirectUrl = this.route.snapshot.queryParams['redirect'];
-            if (redirectUrl && redirectUrl.includes('localhost:4300')) {
-              window.location.href = redirectUrl;
-            } else {
-              window.location.href = `${environment.adminApiUrl}/admin`;
-            }
-          } else {
-            const redirectUrl = this.route.snapshot.queryParams['redirect'];
-            if (redirectUrl) {
-              window.location.href = redirectUrl;
-            } else {
-              window.location.href = environment.clientApiUrl;
-            }
+        this.authService.login(payload).subscribe({
+          next: (user) => {
+            this.loading.set(false);
+            this.toastService.show(`Chào mừng ${user?.fullName || user?.username} đã quay trở lại!`, 'success');
+
+            setTimeout(() => {
+              const roleName = (user?.role?.name || '').toUpperCase();
+              const isAdmin = roleName === 'ADMIN';
+
+              if (isAdmin) {
+                const redirectUrl = this.route.snapshot.queryParams['redirect'];
+                if (redirectUrl && redirectUrl.includes('localhost:4300')) {
+                  window.location.href = redirectUrl;
+                } else {
+                  window.location.href = `${environment.adminApiUrl}/admin`;
+                }
+              } else {
+                const redirectUrl = this.route.snapshot.queryParams['redirect'];
+                if (redirectUrl) {
+                  window.location.href = redirectUrl;
+                } else {
+                  window.location.href = environment.clientApiUrl;
+                }
+              }
+            }, 1000);
+          },
+          error: (err: HttpErrorResponse) => {
+            this.loading.set(false);
+            const errorMsg = err.error?.message || 'Đăng nhập thất bại. Vui lòng kiểm tra lại tài khoản!';
+            this.toastService.show(errorMsg, 'error');
           }
-        }, 1000);
+        });
       },
-      error: (err: HttpErrorResponse) => {
+      error: (err) => {
         this.loading.set(false);
-        const errorMsg = err.error?.message || 'Đăng nhập thất bại. Vui lòng kiểm tra lại tài khoản!';
-        this.toastService.show(errorMsg, 'error');
+        this.toastService.show('Không thể kết nối bảo mật để mã hóa mật khẩu!', 'error');
       }
     });
   }

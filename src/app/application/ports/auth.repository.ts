@@ -11,6 +11,7 @@ export interface AuthRepository {
   resendVerificationCode(email: string): Observable<void>;
   refresh(): Observable<User>;
   getCurrentUser(): Observable<User>;
+  getPublicKey(): Observable<string>;
 }
 
 export const AUTH_REPOSITORY_TOKEN = new InjectionToken<AuthRepository>('AUTH_REPOSITORY_TOKEN');
