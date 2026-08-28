@@ -2,7 +2,7 @@ export type VenueOwnerDocumentKey = 'idCardFront' | 'idCardBack' | 'businessLice
 
 export type VenueOwnerRegistrationFiles = Record<VenueOwnerDocumentKey, File>;
 
-export interface VenueOwnerRegistrationRequest {
+export interface VenueOwnerAccountRegistrationRequest {
   username: string;
   fullName: string;
   email: string;
@@ -10,6 +10,9 @@ export interface VenueOwnerRegistrationRequest {
   confirmPassword: string;
   phone: string;
   identityNumber: string;
+}
+
+export interface VenueOwnerApplicationSubmissionRequest {
   businessName: string;
   businessType: string;
   taxCode: string;
@@ -19,6 +22,12 @@ export interface VenueOwnerRegistrationRequest {
   ward: string;
   city: string;
   files: VenueOwnerRegistrationFiles;
+}
+
+export interface VenueOwnerRegistrationSession {
+  processInstanceKey: number;
+  registrationAccessToken: string;
+  taskKey: number;
 }
 
 export interface ProcessInstanceResponse {

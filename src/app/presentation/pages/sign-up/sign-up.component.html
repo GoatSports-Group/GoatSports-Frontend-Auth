@@ -16,7 +16,7 @@
   <div class="mb-5 grid grid-cols-1 gap-1.5 rounded-2xl border border-slate-200/80 bg-slate-100/90 p-1.5 sm:grid-cols-2"
     role="tablist" aria-label="Loại tài khoản đăng ký">
     <button type="button" role="tab" aria-controls="registration-form" [attr.aria-selected]="accountType() === 'PLAYER'"
-      [disabled]="loading() || registrationSucceeded()" (click)="setAccountType('PLAYER')"
+      [disabled]="loading() || registrationSucceeded() || ownerRegistrationStarted()" (click)="setAccountType('PLAYER')"
       [class]="accountType() === 'PLAYER'
         ? 'flex min-h-11 items-center justify-center gap-2 rounded-xl bg-white px-3 py-2.5 text-[13px] font-black text-emerald-700 shadow-sm transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-600 focus-visible:ring-offset-2 sm:text-sm'
         : 'flex min-h-11 items-center justify-center gap-2 rounded-xl px-3 py-2.5 text-[13px] font-bold text-slate-600 transition-all hover:bg-white/60 hover:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-600 focus-visible:ring-offset-2 sm:text-sm'">
@@ -28,7 +28,7 @@
     </button>
 
     <button type="button" role="tab" aria-controls="registration-form"
-      [attr.aria-selected]="accountType() === 'VENUE_OWNER'" [disabled]="loading() || registrationSucceeded()"
+      [attr.aria-selected]="accountType() === 'VENUE_OWNER'" [disabled]="loading() || registrationSucceeded() || ownerRegistrationStarted()"
       (click)="setAccountType('VENUE_OWNER')"
       [class]="accountType() === 'VENUE_OWNER'
         ? 'flex min-h-11 items-center justify-center gap-2 rounded-xl bg-emerald-600 px-3 py-2.5 text-[13px] font-black text-white shadow-md transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-600 focus-visible:ring-offset-2 sm:text-sm'
@@ -52,7 +52,7 @@
     <div class="min-w-0">
       <h2 class="text-xs font-bold tracking-wide text-emerald-950">Hành trình dành cho đối tác chủ sân</h2>
       <p class="mt-1 break-words text-xs font-normal leading-5 text-emerald-800">
-        Hoàn tất một lần theo workflow: tạo tài khoản chủ sân, và tạo đơn của sân.
+        Tạo tài khoản, xác thực email, khai báo cơ sở và gửi hồ sơ trong cùng một workflow.
       </p>
     </div>
   </div>
@@ -96,7 +96,7 @@
         {{ ownerStepTitle() }}
       </h2>
       <p class="mt-1 text-xs font-semibold text-slate-600">
-        Bước {{ ownerStep() }}/5 • {{ ownerStepDescription() }}
+        Bước {{ ownerStep() }}/4 • {{ ownerStepDescription() }}
       </p>
     </header>
     }
@@ -157,7 +157,7 @@
     }
     }
 
-    @if (accountType() === 'PLAYER' || ownerStep() === 2) {
+    @if (accountType() === 'PLAYER' || ownerStep() === 1) {
     <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
       <app-password-input formControlName="password" fieldId="register-password" errorId="register-password-error"
         label="Mật khẩu" placeholder="••••••••" autocomplete="new-password" [showError]="!!passwordError()"
@@ -194,6 +194,48 @@
     </div>
     }
 
+    @if (accountType() === 'VENUE_OWNER' && ownerStep() === 2) {
+    <section class="rounded-3xl border border-emerald-100 bg-gradient-to-b from-emerald-50/80 to-white px-4 py-6 sm:px-6"
+      aria-labelledby="owner-otp-title">
+      <div class="text-center">
+        <div class="mx-auto flex h-11 w-11 items-center justify-center rounded-2xl bg-emerald-600 text-white shadow-lg shadow-emerald-600/20">
+          <svg class="h-5 w-5" aria-hidden="true" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8m-16 10h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+          </svg>
+        </div>
+        <h3 id="owner-otp-title" class="mt-4 text-xl font-black text-slate-900 font-sports-display">Kiểm tra email của bạn</h3>
+        <p class="mx-auto mt-2 max-w-md text-sm font-medium leading-6 text-slate-600">
+          Mã OTP gồm 6 chữ số đã được gửi tới
+          <strong class="break-all font-extrabold text-slate-800">{{ signUpForm.getRawValue().email }}</strong>.
+        </p>
+      </div>
+
+      <div class="mx-auto mt-6 max-w-md">
+        <label class="block text-[13px] font-extrabold tracking-wide text-slate-700">Mã xác thực OTP</label>
+        <div class="mt-2.5 grid grid-cols-6 gap-2 sm:gap-3" (paste)="onOwnerOtpPaste($event)">
+          @for (digit of ownerOtp(); track $index) {
+          <input [id]="'owner-otp-' + $index" type="text" maxlength="1" inputmode="numeric" autocomplete="one-time-code"
+            class="h-12 min-w-0 rounded-xl border border-slate-300 bg-white text-center text-xl font-black text-slate-900 outline-none transition hover:border-slate-400 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 sm:h-14 sm:rounded-2xl"
+            [value]="digit" [disabled]="loading()" [attr.aria-label]="'Chữ số OTP thứ ' + ($index + 1)"
+            (input)="onOwnerOtpInput($event, $index)" (keydown)="onOwnerOtpKeyDown($event, $index)">
+          }
+        </div>
+        <p class="mt-4 text-center text-sm font-semibold text-slate-500">
+          Không nhận được mã?
+          @if (resendCountdown() > 0) {
+          <span>Gửi lại sau <strong class="text-slate-700">{{ resendCountdown() }}s</strong></span>
+          } @else {
+          <button type="button" class="font-extrabold text-emerald-700 hover:underline disabled:opacity-60"
+            [disabled]="resendLoading()" (click)="resendOwnerOtp()">
+            {{ resendLoading() ? 'Đang gửi…' : 'Gửi lại mã' }}
+          </button>
+          }
+        </p>
+      </div>
+    </section>
+    }
+
     @if (accountType() === 'VENUE_OWNER' && ownerStep() === 3) {
     <div class="grid grid-cols-1 gap-4 sm:grid-cols-2" [formGroup]="ownerForm">
       <label class="block text-sm font-extrabold text-slate-700 sm:col-span-2">
@@ -223,7 +265,7 @@
     </div>
     }
 
-    @if (accountType() === 'VENUE_OWNER' && ownerStep() === 4) {
+    @if (accountType() === 'VENUE_OWNER' && ownerStep() === 3) {
     <div class="grid grid-cols-1 gap-4 sm:grid-cols-2" [formGroup]="ownerForm">
       <label class="block text-sm font-extrabold text-slate-700 sm:col-span-2">
         Địa chỉ chi tiết
@@ -251,7 +293,7 @@
     </div>
     }
 
-    @if (accountType() === 'VENUE_OWNER' && ownerStep() === 5) {
+    @if (accountType() === 'VENUE_OWNER' && ownerStep() === 4) {
     <div class="rounded-2xl border border-slate-200 bg-slate-50 p-4">
       <p class="text-sm font-black text-slate-900">Tài liệu bắt buộc</p>
       <p class="mt-1 text-xs font-semibold leading-5 text-slate-600">Ảnh hoặc PDF, tối đa 2MB mỗi tệp. Các tệp được
@@ -286,11 +328,24 @@
     <app-submit-button label="Tạo tài khoản người chơi" loadingLabel="Đang tạo tài khoản…" [loading]="loading()"
       [disabled]="signUpForm.invalid || registrationSucceeded()" />
     } @else if (ownerStep() === 1) {
-    <button type="button" data-testid="owner-next-step"
-      class="flex min-h-12 w-full items-center justify-center gap-3 rounded-2xl bg-emerald-600 px-5 py-3.5 text-sm font-black text-white shadow-lg shadow-emerald-600/20 transition-colors hover:bg-emerald-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-600 focus-visible:ring-offset-2"
-      (click)="nextOwnerStep()">
-      <span>Tiếp tục</span>
+    <button type="submit" data-testid="owner-start-registration"
+      class="flex min-h-12 w-full items-center justify-center gap-3 rounded-2xl bg-emerald-600 px-5 py-3.5 text-sm font-black text-white shadow-lg shadow-emerald-600/20 transition-colors hover:bg-emerald-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-600 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:bg-emerald-300 disabled:shadow-none"
+      [disabled]="signUpForm.invalid || ownerForm.controls.phone.invalid || ownerForm.controls.identityNumber.invalid || loading()">
+      <span>Tạo tài khoản &amp; gửi OTP</span>
       <kbd class="rounded-md bg-white/15 px-2 py-0.5 text-[10px] font-bold">Enter ↵</kbd>
+    </button>
+    } @else if (ownerStep() === 2) {
+    <button type="submit" data-testid="owner-verify-email"
+      class="min-h-12 w-full rounded-2xl bg-emerald-600 px-5 py-3.5 text-sm font-black text-white shadow-lg shadow-emerald-600/20 transition hover:bg-emerald-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-600 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:bg-emerald-300 disabled:shadow-none"
+      [disabled]="!ownerOtpComplete() || loading()">
+      Xác thực &amp; tiếp tục
+    </button>
+    } @else if (ownerStep() === 3) {
+    <button type="button" data-testid="owner-next-step"
+      class="min-h-12 w-full rounded-2xl bg-emerald-600 px-5 py-3.5 text-sm font-black text-white shadow-lg shadow-emerald-600/20 transition hover:bg-emerald-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-600 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:bg-emerald-300 disabled:shadow-none"
+      [disabled]="ownerForm.controls.businessName.invalid || ownerForm.controls.businessType.invalid || ownerForm.controls.taxCode.invalid || ownerForm.controls.address.invalid || ownerForm.controls.ward.invalid || ownerForm.controls.district.invalid || ownerForm.controls.province.invalid || ownerForm.controls.city.invalid"
+      (click)="nextOwnerStep()">
+      Tiếp tục đến hồ sơ
     </button>
     } @else {
     <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
@@ -299,15 +354,8 @@
         [disabled]="loading()" (click)="previousOwnerStep()">
         Quay lại
       </button>
-      @if (ownerStep() < 5) { <button type="button" data-testid="owner-next-step"
-        class="min-h-12 rounded-2xl bg-emerald-600 px-5 py-3.5 text-sm font-black text-white shadow-lg shadow-emerald-600/20 transition hover:bg-emerald-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-600 focus-visible:ring-offset-2"
-        (click)="nextOwnerStep()">
-        Tiếp tục
-        </button>
-        } @else {
-        <app-submit-button label="Gửi đăng ký chủ sân" loadingLabel="Đang thực thi workflow…" [loading]="loading()"
-          [disabled]="loading() || registrationSucceeded()" />
-        }
+      <app-submit-button label="Gửi hồ sơ chủ sân" loadingLabel="Đang thực thi workflow…" [loading]="loading()"
+        [disabled]="!ownerDocumentsComplete() || loading() || registrationSucceeded()" />
     </div>
     }
   </form>

@@ -7,14 +7,14 @@
   position: relative;
   display: grid;
   min-width: 0;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
 }
 
 .journey-stepper__track {
   position: absolute;
   top: 19px;
-  left: 10%;
-  width: 80%;
+  left: 12.5%;
+  width: 75%;
   height: 2px;
   overflow: hidden;
   border-radius: 999px;

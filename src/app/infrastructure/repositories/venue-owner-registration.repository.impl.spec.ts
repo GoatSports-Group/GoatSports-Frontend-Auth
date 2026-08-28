@@ -1,7 +1,11 @@
 import { TestBed } from '@angular/core/testing';
 import { firstValueFrom, of, Subject } from 'rxjs';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { VenueOwnerRegistrationRequest } from '@application/dto/venue-owner-registration/venue-owner-registration.dto';
+import {
+  VenueOwnerAccountRegistrationRequest,
+  VenueOwnerApplicationSubmissionRequest,
+  VenueOwnerRegistrationSession
+} from '@application/dto/venue-owner-registration/venue-owner-registration.dto';
 import { WorkflowApi } from '@infrastructure/api/workflow.api';
 import { VenueOwnerRegistrationRepositoryImpl } from './venue-owner-registration.repository.impl';
 
@@ -21,20 +25,8 @@ describe('VenueOwnerRegistrationRepositoryImpl', () => {
     workflowApi.start.mockReturnValue(of({
       data: { processInstanceKey: 991, registrationAccessToken: 'registration-token' }
     }));
-    workflowApi.getVariables.mockReturnValue(of({
-      data: {
-        ownerApplicationId: 'owner-application-id',
-        presignedUrls: [0, 1, 2, 3].map(index => ({
-          uploadUrl: `https://upload.example/${index}`,
-          objectKey: `document-${index}`
-        }))
-      }
-    }));
-    workflowApi.uploadToPresignedUrl.mockReturnValue(of(void 0));
-    workflowApi.getTask.mockReturnValue(of({
-      data: { key: 123, elementId: 'Task_UserUpload' }
-    }));
     workflowApi.completeTask.mockReturnValue(of({ data: void 0 }));
+    workflowApi.uploadToPresignedUrl.mockReturnValue(of(void 0));
 
     TestBed.configureTestingModule({
       providers: [
@@ -45,79 +37,81 @@ describe('VenueOwnerRegistrationRepositoryImpl', () => {
     repository = TestBed.inject(VenueOwnerRegistrationRepositoryImpl);
   });
 
-  it('start workflow, upload đủ tài liệu rồi complete đúng user task bằng registration token', async () => {
-    await firstValueFrom(repository.register(createRequest()));
+  it('khởi động workflow bằng dữ liệu tài khoản rồi dừng tại task xác thực email', async () => {
+    workflowApi.getTask.mockReturnValue(of({ data: { key: 11, elementId: 'Task_VerifyEmail' } }));
 
-    expect(workflowApi.start).toHaveBeenCalledTimes(1);
-    const variables = workflowApi.start.mock.calls[0][0] as Record<string, unknown>;
-    expect(variables['username']).toBe('goat.owner');
-    expect(variables['role']).toBeUndefined();
-    expect(variables['files']).toBeUndefined();
-    expect(variables['presignedRequests']).toEqual([
-      { fileName: 'front.png', contentType: 'image/png', folder: 'identities' },
-      { fileName: 'back.png', contentType: 'image/png', folder: 'identities' },
-      { fileName: 'license.pdf', contentType: 'application/pdf', folder: 'licenses' },
-      { fileName: 'venue.png', contentType: 'image/png', folder: 'venues' }
-    ]);
-    expect(workflowApi.getVariables).toHaveBeenCalledWith(991, 'registration-token');
+    const session = await firstValueFrom(repository.startAccount(createAccountRequest()));
+
+    expect(workflowApi.start).toHaveBeenCalledWith(createAccountRequest());
+    expect(session).toEqual({
+      processInstanceKey: 991,
+      registrationAccessToken: 'registration-token',
+      taskKey: 11
+    });
+    expect(workflowApi.getVariables).not.toHaveBeenCalled();
+  });
+
+  it('chỉ mở task khai báo cơ sở sau khi frontend xác thực email', async () => {
+    workflowApi.getTask.mockReturnValue(of({ data: { key: 22, elementId: 'Task_CollectOwnerApplication' } }));
+
+    const session = await firstValueFrom(repository.continueAfterEmailVerification(createSession(11)));
+
+    expect(workflowApi.completeTask).toHaveBeenCalledWith(11, { emailVerified: true }, 'registration-token');
+    expect(session.taskKey).toBe(22);
+  });
+
+  it('complete thông tin cơ sở, upload đủ tài liệu rồi complete user-upload task', async () => {
+    workflowApi.getVariables.mockReturnValue(of({
+      data: {
+        ownerApplicationId: 'owner-application-id',
+        presignedUrls: [0, 1, 2, 3].map(index => ({
+          uploadUrl: `https://upload.example/${index}`,
+          objectKey: `document-${index}`
+        }))
+      }
+    }));
+    workflowApi.getTask.mockReturnValue(of({ data: { key: 33, elementId: 'Task_UserUpload' } }));
+
+    await firstValueFrom(repository.submitApplication(createSession(22), createApplicationRequest()));
+
+    const firstCompletion = workflowApi.completeTask.mock.calls[0];
+    expect(firstCompletion[0]).toBe(22);
+    expect(firstCompletion[1]).toMatchObject({
+      businessName: 'GOAT Arena',
+      address: '12 Nguyễn Văn Bảo',
+      presignedRequests: expect.any(Array)
+    });
     expect(workflowApi.uploadToPresignedUrl).toHaveBeenCalledTimes(4);
-    expect(workflowApi.getTask).toHaveBeenCalledWith(991, 'registration-token');
-    expect(workflowApi.getTask).toHaveBeenCalledTimes(1);
-    expect(workflowApi.completeTask).toHaveBeenCalledWith(
-      123,
-      ['document-0', 'document-1', 'document-2', 'document-3'],
+    expect(workflowApi.completeTask).toHaveBeenLastCalledWith(
+      33,
+      { documentKeys: ['document-0', 'document-1', 'document-2', 'document-3'] },
       'registration-token'
     );
   });
 
-  it('không gửi chồng request variables khi request trước chưa hoàn tất', async () => {
+  it('không poll chồng request khi lần lấy task trước chưa hoàn tất', async () => {
     vi.useFakeTimers();
-    const pendingVariables = new Subject<never>();
-    workflowApi.getVariables.mockReturnValue(pendingVariables);
-    const subscription = repository.register(createRequest()).subscribe();
+    const pendingTask = new Subject<never>();
+    workflowApi.getTask.mockReturnValue(pendingTask);
+    const subscription = repository.startAccount(createAccountRequest()).subscribe();
 
     try {
       await vi.advanceTimersByTimeAsync(0);
-      expect(workflowApi.getVariables).toHaveBeenCalledTimes(1);
-
-      await vi.advanceTimersByTimeAsync(6000);
-      expect(workflowApi.getVariables).toHaveBeenCalledTimes(1);
+      expect(workflowApi.getTask).toHaveBeenCalledTimes(1);
+      await vi.advanceTimersByTimeAsync(5000);
+      expect(workflowApi.getTask).toHaveBeenCalledTimes(1);
     } finally {
       subscription.unsubscribe();
       vi.useRealTimers();
     }
   });
-
-  it('chỉ upload sau khi có cả owner application và bốn presigned URL', async () => {
-    vi.useFakeTimers();
-    workflowApi.getVariables
-      .mockReturnValueOnce(of({ data: { ownerApplicationId: 'owner-application-id' } }))
-      .mockReturnValueOnce(of({
-        data: {
-          ownerApplicationId: 'owner-application-id',
-          presignedUrls: [0, 1, 2, 3].map(index => ({
-            uploadUrl: `https://upload.example/${index}`,
-            objectKey: `document-${index}`
-          }))
-        }
-      }));
-
-    try {
-      const registration = firstValueFrom(repository.register(createRequest()));
-      await vi.advanceTimersByTimeAsync(0);
-      expect(workflowApi.uploadToPresignedUrl).not.toHaveBeenCalled();
-
-      await vi.advanceTimersByTimeAsync(1500);
-      await registration;
-      expect(workflowApi.uploadToPresignedUrl).toHaveBeenCalledTimes(4);
-      expect(workflowApi.completeTask).toHaveBeenCalledTimes(1);
-    } finally {
-      vi.useRealTimers();
-    }
-  });
 });
 
-function createRequest(): VenueOwnerRegistrationRequest {
+function createSession(taskKey: number): VenueOwnerRegistrationSession {
+  return { processInstanceKey: 991, registrationAccessToken: 'registration-token', taskKey };
+}
+
+function createAccountRequest(): VenueOwnerAccountRegistrationRequest {
   return {
     username: 'goat.owner',
     fullName: 'Nguyễn Minh',
@@ -125,7 +119,12 @@ function createRequest(): VenueOwnerRegistrationRequest {
     password: 'encrypted-password',
     confirmPassword: 'encrypted-password',
     phone: '0901234567',
-    identityNumber: '012345678901',
+    identityNumber: '012345678901'
+  };
+}
+
+function createApplicationRequest(): VenueOwnerApplicationSubmissionRequest {
+  return {
     businessName: 'GOAT Arena',
     businessType: 'COMPANY',
     taxCode: '0123456789',

@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import {
-  VenueOwnerAccountRegistrationRequest,
+  VenueOwnerApplicationSubmissionRequest,
   VenueOwnerRegistrationSession
 } from '@application/dto/venue-owner-registration/venue-owner-registration.dto';
 import {
@@ -10,13 +10,16 @@ import {
 } from '@application/ports/venue-owner-registration.repository';
 
 @Injectable({ providedIn: 'root' })
-export class RegisterVenueOwnerUseCase {
+export class SubmitVenueOwnerApplicationUseCase {
   constructor(
     @Inject(VENUE_OWNER_REGISTRATION_REPOSITORY_TOKEN)
     private readonly repository: VenueOwnerRegistrationRepository
   ) { }
 
-  execute(request: VenueOwnerAccountRegistrationRequest): Observable<VenueOwnerRegistrationSession> {
-    return this.repository.startAccount(request);
+  execute(
+    session: VenueOwnerRegistrationSession,
+    request: VenueOwnerApplicationSubmissionRequest
+  ): Observable<void> {
+    return this.repository.submitApplication(session, request);
   }
 }

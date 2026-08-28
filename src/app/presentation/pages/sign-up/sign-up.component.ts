@@ -16,8 +16,10 @@ import { finalize, map, switchMap, take, timer } from 'rxjs';
 import { RegisterRequest } from '@application/dto/auth/auth.dto';
 import {
   VenueOwnerDocumentKey,
+  VenueOwnerAccountRegistrationRequest,
+  VenueOwnerApplicationSubmissionRequest,
   VenueOwnerRegistrationFiles,
-  VenueOwnerRegistrationRequest
+  VenueOwnerRegistrationSession
 } from '@application/dto/venue-owner-registration/venue-owner-registration.dto';
 import { AuthService } from '@presentation/services/auth.service';
 import { CryptoService } from '@presentation/services/crypto.service';
@@ -33,7 +35,7 @@ import { trimmedLengthValidator } from '@shared/validators/registration.validato
 import { passwordMatchValidator } from '@shared/validators/password.validators';
 
 export type RegistrationAccountType = 'PLAYER' | 'VENUE_OWNER';
-type OwnerRegistrationStep = 1 | 2 | 3 | 4 | 5;
+type OwnerRegistrationStep = 1 | 2 | 3 | 4;
 
 type RegistrationControlName = 'username' | 'fullName' | 'email' | 'password' | 'confirmPassword';
 type RegistrationFormValue = {
@@ -75,10 +77,18 @@ export class SignUpComponent {
   readonly ownerStep = signal<OwnerRegistrationStep>(1);
   readonly loading = signal(false);
   readonly loadingTitle = computed(() => this.accountType() === 'VENUE_OWNER'
-    ? 'Đang tạo hồ sơ chủ sân'
+    ? this.ownerStep() === 1
+      ? 'Đang tạo tài khoản chủ sân'
+      : this.ownerStep() === 2
+        ? 'Đang xác thực email'
+        : 'Đang gửi hồ sơ chủ sân'
     : 'Đang tạo tài khoản người chơi');
   readonly loadingMessage = computed(() => this.accountType() === 'VENUE_OWNER'
-    ? 'Hệ thống đang tạo tài khoản, hồ sơ và tải tài liệu. Vui lòng không đóng hoặc tải lại trang.'
+    ? this.ownerStep() === 1
+      ? 'Workflow đang tạo tài khoản và gửi mã OTP tới email của bạn.'
+      : this.ownerStep() === 2
+        ? 'Hệ thống đang kiểm tra OTP và mở bước khai báo thông tin cơ sở.'
+        : 'Workflow đang tạo đơn, cấp đường dẫn tải lên và xử lý tài liệu.'
     : 'Hệ thống đang tạo tài khoản của bạn. Vui lòng không đóng hoặc tải lại trang.');
   readonly registrationSucceeded = signal(false);
   readonly successMessage = signal('');
@@ -91,11 +101,19 @@ export class SignUpComponent {
     venueImage: null
   });
   readonly fileError = signal<string | null>(null);
+  readonly ownerOtp = signal<string[]>(['', '', '', '', '', '']);
+  readonly ownerOtpComplete = computed(() => this.ownerOtp().every(digit => /^\d$/.test(digit)));
+  readonly resendCountdown = signal(0);
+  readonly resendLoading = signal(false);
+  readonly ownerDocumentsComplete = computed(() => Object.values(this.ownerFiles()).every(Boolean));
+  readonly ownerRegistrationStarted = computed(() => this.ownerSession() !== null);
 
   private readonly submitted = signal(false);
   private readonly validationVersion = signal(0);
   private readonly duplicateUsername = signal(false);
   private readonly duplicateEmail = signal(false);
+  private readonly ownerSession = signal<VenueOwnerRegistrationSession | null>(null);
+  private resendTimer: ReturnType<typeof setInterval> | null = null;
 
   readonly signUpForm = this.fb.nonNullable.group({
     username: ['', [
@@ -193,15 +211,19 @@ export class SignUpComponent {
 
     this.clearDuplicateErrorOnChange('username');
     this.clearDuplicateErrorOnChange('email');
+    this.destroyRef.onDestroy(() => this.clearResendTimer());
   }
 
   setAccountType(type: RegistrationAccountType): void {
-    if (this.loading() || this.registrationSucceeded() || type === this.accountType()) {
+    if (this.loading() || this.registrationSucceeded() || this.ownerRegistrationStarted() || type === this.accountType()) {
       return;
     }
 
     this.accountType.set(type);
     this.ownerStep.set(1);
+    this.ownerSession.set(null);
+    this.ownerOtp.set(['', '', '', '', '', '']);
+    this.clearResendTimer();
     this.submitted.set(false);
     this.signUpForm.markAsUntouched();
     this.apiError.set(null);
@@ -219,19 +241,19 @@ export class SignUpComponent {
       return;
     }
 
-    if (this.accountType() === 'VENUE_OWNER' && this.ownerStep() < 5) {
-      this.nextOwnerStep();
+    if (this.accountType() === 'VENUE_OWNER') {
+      if (this.ownerStep() === 1) this.startOwnerRegistration();
+      else if (this.ownerStep() === 2) this.verifyOwnerEmail();
+      else if (this.ownerStep() === 3) this.nextOwnerStep();
+      else this.submitOwnerApplication();
       return;
     }
 
     this.submitted.set(true);
     this.signUpForm.markAllAsTouched();
-    if (this.accountType() === 'VENUE_OWNER') {
-      this.ownerForm.markAllAsTouched();
-    }
     this.validationVersion.update(version => version + 1);
 
-    if (this.signUpForm.invalid || (this.accountType() === 'VENUE_OWNER' && !this.isOwnerSubmissionValid())) {
+    if (this.signUpForm.invalid) {
       this.focusFirstInvalidControl();
       return;
     }
@@ -239,7 +261,6 @@ export class SignUpComponent {
     this.apiError.set(null);
     this.loading.set(true);
     this.signUpForm.disable({ emitEvent: false });
-    this.ownerForm.disable({ emitEvent: false });
 
     const formValue = this.signUpForm.getRawValue();
     const accountType = this.accountType();
@@ -248,9 +269,7 @@ export class SignUpComponent {
     this.cryptoService.getPublicKey().pipe(
       take(1),
       map(publicKey => this.createRegisterPayload(formValue, publicKey)),
-      switchMap(payload => accountType === 'VENUE_OWNER'
-        ? this.authService.registerVenueOwner(this.createVenueOwnerRequest(payload))
-        : this.authService.register(payload)),
+      switchMap(payload => this.authService.register(payload)),
       finalize(() => {
         this.loading.set(false);
         this.validationVersion.update(version => version + 1);
@@ -267,15 +286,14 @@ export class SignUpComponent {
   }
 
   ownerStepTitle(): string {
-    return ['Thông tin tài khoản', 'Bảo mật tài khoản', 'Xác thực kinh doanh', 'Địa chỉ sân', 'Hồ sơ chủ sân'][this.ownerStep() - 1];
+    return ['Tài khoản', 'Xác thực email', 'Thông tin cơ sở', 'Hồ sơ chủ sân'][this.ownerStep() - 1];
   }
 
   ownerStepDescription(): string {
     return [
-      'Thông tin người đại diện và tài khoản',
-      'Tạo mật khẩu bảo vệ tài khoản',
-      'Thông tin pháp lý của cơ sở kinh doanh',
-      'Địa chỉ cơ sở hoặc sân dự kiến vận hành',
+      'Thông tin người đại diện, liên hệ và bảo mật tài khoản',
+      'Nhập mã OTP gồm 6 chữ số đã gửi tới email đăng ký',
+      'Thông tin kinh doanh và địa chỉ cơ sở dự kiến vận hành',
       'Tải tài liệu giống quy trình Owner Application'
     ][this.ownerStep() - 1];
   }
@@ -285,17 +303,19 @@ export class SignUpComponent {
       return;
     }
 
-    const controls = this.getOwnerStepControls(this.ownerStep());
+    if (this.ownerStep() !== 3) return;
+
+    const controls = this.getOwnerStepControls(3);
     controls.forEach(control => control.markAsTouched());
     this.validationVersion.update(version => version + 1);
 
-    if (controls.some(control => control.invalid) || (this.ownerStep() === 2 && this.signUpForm.invalid)) {
+    if (controls.some(control => control.invalid)) {
       this.focusFirstInvalidControl();
       return;
     }
 
     this.apiError.set(null);
-    this.ownerStep.update(step => Math.min(5, step + 1) as OwnerRegistrationStep);
+    this.ownerStep.set(4);
     this.focusOwnerStepHeading();
   }
 
@@ -304,7 +324,7 @@ export class SignUpComponent {
       return;
     }
 
-    this.ownerStep.update(step => Math.max(1, step - 1) as OwnerRegistrationStep);
+    if (this.ownerStep() === 4) this.ownerStep.set(3);
     this.focusOwnerStepHeading();
   }
 
@@ -314,8 +334,9 @@ export class SignUpComponent {
       this.loading() ||
       this.registrationSucceeded() ||
       step < 1 ||
-      step > 5 ||
-      step > this.ownerStep()
+      step > 4 ||
+      step > this.ownerStep() ||
+      (this.ownerSession() !== null && step < 3)
     ) {
       return;
     }
@@ -323,6 +344,160 @@ export class SignUpComponent {
     this.ownerStep.set(step as OwnerRegistrationStep);
     this.apiError.set(null);
     this.focusOwnerStepHeading();
+  }
+
+  startOwnerRegistration(): void {
+    if (this.loading() || this.ownerStep() !== 1) return;
+
+    const controls = this.getOwnerStepControls(1);
+    controls.forEach(control => control.markAsTouched());
+    this.validationVersion.update(version => version + 1);
+    if (controls.some(control => control.invalid) || this.signUpForm.invalid) {
+      this.focusFirstInvalidControl();
+      return;
+    }
+
+    this.apiError.set(null);
+    this.loading.set(true);
+    this.signUpForm.disable({ emitEvent: false });
+    this.ownerForm.controls.phone.disable({ emitEvent: false });
+    this.ownerForm.controls.identityNumber.disable({ emitEvent: false });
+
+    const formValue = this.signUpForm.getRawValue();
+    this.cryptoService.getPublicKey().pipe(
+      take(1),
+      map(publicKey => this.createRegisterPayload(formValue, publicKey)),
+      map(payload => this.createVenueOwnerAccountRequest(payload)),
+      switchMap(payload => this.authService.startVenueOwnerRegistration(payload)),
+      finalize(() => {
+        this.loading.set(false);
+        this.validationVersion.update(version => version + 1);
+      }),
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe({
+      next: session => {
+        this.ownerSession.set(session);
+        this.ownerStep.set(2);
+        this.startResendCountdown();
+        this.toastService.show('Mã OTP đã được gửi tới email đăng ký.', 'success');
+        this.focusOwnerStepHeading();
+      },
+      error: error => {
+        this.signUpForm.enable({ emitEvent: false });
+        this.ownerForm.controls.phone.enable({ emitEvent: false });
+        this.ownerForm.controls.identityNumber.enable({ emitEvent: false });
+        this.handleRegistrationError(error);
+      }
+    });
+  }
+
+  verifyOwnerEmail(): void {
+    const session = this.ownerSession();
+    if (this.loading() || this.ownerStep() !== 2 || !session || !this.ownerOtpComplete()) return;
+
+    this.apiError.set(null);
+    this.loading.set(true);
+    this.authService.verifyVenueOwnerEmail({
+      email: this.signUpForm.getRawValue().email.trim(),
+      verificationCode: this.ownerOtp().join('')
+    }, session).pipe(
+      finalize(() => this.loading.set(false)),
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe({
+      next: nextSession => {
+        this.ownerSession.set(nextSession);
+        this.ownerStep.set(3);
+        this.clearResendTimer();
+        this.toastService.show('Email đã được xác thực thành công.', 'success');
+        this.focusOwnerStepHeading();
+      },
+      error: error => {
+        const message = this.extractApiMessage(error) || 'Mã OTP không chính xác hoặc đã hết hạn.';
+        this.apiError.set(message);
+        this.toastService.show(message, 'error');
+      }
+    });
+  }
+
+  resendOwnerOtp(): void {
+    const email = this.signUpForm.getRawValue().email.trim();
+    if (this.resendLoading() || this.resendCountdown() > 0 || !email) return;
+
+    this.resendLoading.set(true);
+    this.authService.resendVerificationCode(email).pipe(
+      finalize(() => this.resendLoading.set(false)),
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe({
+      next: () => {
+        this.ownerOtp.set(['', '', '', '', '', '']);
+        this.startResendCountdown();
+        this.toastService.show('Đã gửi lại mã OTP mới tới email của bạn.', 'success');
+      },
+      error: error => {
+        const message = this.extractApiMessage(error);
+        this.apiError.set(message);
+        this.toastService.show(message, 'error');
+      }
+    });
+  }
+
+  onOwnerOtpInput(event: Event, index: number): void {
+    const input = event.target as HTMLInputElement;
+    const digit = input.value.replace(/\D/g, '').slice(-1);
+    input.value = digit;
+    this.ownerOtp.update(value => value.map((item, itemIndex) => itemIndex === index ? digit : item));
+    if (digit && index < 5) {
+      this.focusOtpInput(index + 1);
+    }
+  }
+
+  onOwnerOtpKeyDown(event: KeyboardEvent, index: number): void {
+    if (event.key === 'Backspace' && !this.ownerOtp()[index] && index > 0) {
+      this.ownerOtp.update(value => value.map((item, itemIndex) => itemIndex === index - 1 ? '' : item));
+      this.focusOtpInput(index - 1);
+    }
+  }
+
+  onOwnerOtpPaste(event: ClipboardEvent): void {
+    const digits = event.clipboardData?.getData('text').replace(/\D/g, '').slice(0, 6) ?? '';
+    if (!digits) return;
+    event.preventDefault();
+    this.ownerOtp.set(Array.from({ length: 6 }, (_, index) => digits[index] ?? ''));
+    this.focusOtpInput(Math.min(digits.length, 6) - 1);
+  }
+
+  submitOwnerApplication(): void {
+    const session = this.ownerSession();
+    if (this.loading() || this.ownerStep() !== 4 || !session) return;
+
+    this.submitted.set(true);
+    this.ownerForm.markAllAsTouched();
+    if (!this.isOwnerSubmissionValid()) {
+      this.validationVersion.update(version => version + 1);
+      this.focusFirstInvalidControl();
+      return;
+    }
+
+    this.apiError.set(null);
+    this.loading.set(true);
+    this.ownerForm.disable({ emitEvent: false });
+    this.authService.submitVenueOwnerApplication(session, this.createVenueOwnerApplicationRequest()).pipe(
+      finalize(() => {
+        this.loading.set(false);
+        this.validationVersion.update(version => version + 1);
+      }),
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe({
+      next: () => this.handleRegistrationSuccess('VENUE_OWNER', this.signUpForm.getRawValue().email),
+      error: error => {
+        this.ownerForm.enable({ emitEvent: false });
+        this.ownerForm.controls.phone.disable({ emitEvent: false });
+        this.ownerForm.controls.identityNumber.disable({ emitEvent: false });
+        const message = this.extractApiMessage(error);
+        this.apiError.set(message);
+        this.toastService.show(message, 'error');
+      }
+    });
   }
 
   private createRegisterPayload(
@@ -380,15 +555,28 @@ export class SignUpComponent {
     return this.ownerFiles()[key];
   }
 
-  private createVenueOwnerRequest(payload: RegisterRequest): VenueOwnerRegistrationRequest {
-    const files = this.ownerFiles();
+  private createVenueOwnerAccountRequest(payload: RegisterRequest): VenueOwnerAccountRegistrationRequest {
     const owner = this.ownerForm.getRawValue();
 
     return {
       ...payload,
-      ...owner,
       phone: owner.phone.replace(/[\s.-]/g, ''),
-      files: files as VenueOwnerRegistrationFiles
+      identityNumber: owner.identityNumber.trim()
+    };
+  }
+
+  private createVenueOwnerApplicationRequest(): VenueOwnerApplicationSubmissionRequest {
+    const owner = this.ownerForm.getRawValue();
+    return {
+      businessName: owner.businessName.trim(),
+      businessType: owner.businessType,
+      taxCode: owner.taxCode.trim(),
+      address: owner.address.trim(),
+      province: owner.province.trim(),
+      district: owner.district.trim(),
+      ward: owner.ward.trim(),
+      city: owner.city.trim(),
+      files: this.ownerFiles() as VenueOwnerRegistrationFiles
     };
   }
 
@@ -590,25 +778,24 @@ export class SignUpComponent {
           this.signUpForm.controls.username,
           this.signUpForm.controls.email,
           this.ownerForm.controls.phone,
-          this.ownerForm.controls.identityNumber
+          this.ownerForm.controls.identityNumber,
+          this.signUpForm.controls.password,
+          this.signUpForm.controls.confirmPassword
         ];
       case 2:
-        return [this.signUpForm.controls.password, this.signUpForm.controls.confirmPassword];
+        return [];
       case 3:
         return [
           this.ownerForm.controls.businessName,
           this.ownerForm.controls.businessType,
-          this.ownerForm.controls.taxCode
-        ];
-      case 4:
-        return [
+          this.ownerForm.controls.taxCode,
           this.ownerForm.controls.address,
           this.ownerForm.controls.ward,
           this.ownerForm.controls.district,
           this.ownerForm.controls.province,
           this.ownerForm.controls.city
         ];
-      case 5:
+      case 4:
         return [];
     }
   }
@@ -616,16 +803,13 @@ export class SignUpComponent {
   private isOwnerSubmissionValid(): boolean {
     const missingDocument = Object.values(this.ownerFiles()).some(file => !file);
     if (missingDocument) {
-      this.ownerStep.set(5);
+      this.ownerStep.set(4);
       this.fileError.set('Vui lòng tải lên đầy đủ 4 tài liệu bắt buộc.');
       return false;
     }
 
     if (this.ownerForm.invalid) {
-      const invalidStep = ([1, 3, 4] as const).find(step =>
-        this.getOwnerStepControls(step).some(control => control.invalid)
-      );
-      if (invalidStep) this.ownerStep.set(invalidStep);
+      this.ownerStep.set(3);
       return false;
     }
 
@@ -635,6 +819,28 @@ export class SignUpComponent {
   private focusOwnerStepHeading(): void {
     queueMicrotask(() => {
       this.host.nativeElement.querySelector<HTMLElement>('#owner-step-title')?.focus();
+    });
+  }
+
+  private startResendCountdown(): void {
+    this.clearResendTimer();
+    this.resendCountdown.set(60);
+    this.resendTimer = setInterval(() => {
+      this.resendCountdown.update(value => Math.max(0, value - 1));
+      if (this.resendCountdown() === 0) this.clearResendTimer();
+    }, 1000);
+  }
+
+  private clearResendTimer(): void {
+    if (this.resendTimer !== null) {
+      clearInterval(this.resendTimer);
+      this.resendTimer = null;
+    }
+  }
+
+  private focusOtpInput(index: number): void {
+    queueMicrotask(() => {
+      this.host.nativeElement.querySelector<HTMLInputElement>(`#owner-otp-${index}`)?.focus();
     });
   }
 }

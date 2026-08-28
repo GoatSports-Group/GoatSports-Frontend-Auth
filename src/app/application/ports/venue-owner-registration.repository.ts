@@ -1,9 +1,18 @@
 import { InjectionToken } from '@angular/core';
 import { Observable } from 'rxjs';
-import { VenueOwnerRegistrationRequest } from '@application/dto/venue-owner-registration/venue-owner-registration.dto';
+import {
+  VenueOwnerAccountRegistrationRequest,
+  VenueOwnerApplicationSubmissionRequest,
+  VenueOwnerRegistrationSession
+} from '@application/dto/venue-owner-registration/venue-owner-registration.dto';
 
 export interface VenueOwnerRegistrationRepository {
-  register(request: VenueOwnerRegistrationRequest): Observable<void>;
+  startAccount(request: VenueOwnerAccountRegistrationRequest): Observable<VenueOwnerRegistrationSession>;
+  continueAfterEmailVerification(session: VenueOwnerRegistrationSession): Observable<VenueOwnerRegistrationSession>;
+  submitApplication(
+    session: VenueOwnerRegistrationSession,
+    request: VenueOwnerApplicationSubmissionRequest
+  ): Observable<void>;
 }
 
 export const VENUE_OWNER_REGISTRATION_REPOSITORY_TOKEN =

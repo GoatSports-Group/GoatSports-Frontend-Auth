@@ -40,9 +40,13 @@ export class WorkflowApi {
     });
   }
 
-  completeTask(taskKey: number, documentKeys: string[], registrationToken: string): Observable<BaseResponse<void>> {
+  completeTask(
+    taskKey: number,
+    variables: Record<string, unknown>,
+    registrationToken: string
+  ): Observable<BaseResponse<void>> {
     return this.http.post<BaseResponse<void>>(`${this.baseUrl}/tasks/${taskKey}/complete`, {
-      variables: { documentKeys }
+      variables
     }, { headers: { 'X-Registration-Token': registrationToken } });
   }
 }
