@@ -19,7 +19,6 @@ import {
   VenueOwnerRegistrationFiles,
   VenueOwnerRegistrationRequest
 } from '@application/dto/venue-owner-registration/venue-owner-registration.dto';
-import { RegisterVenueOwnerUseCase } from '@application/usecase/venue-owner-registration/register-venue-owner.usecase';
 import { AuthService } from '@presentation/services/auth.service';
 import { CryptoService } from '@presentation/services/crypto.service';
 import { ToastService } from '@shared/services/toast.service';
@@ -69,7 +68,6 @@ export class SignUpComponent {
   private readonly route = inject(ActivatedRoute);
   private readonly toastService = inject(ToastService);
   private readonly cryptoService = inject(CryptoService);
-  private readonly registerVenueOwnerUseCase = inject(RegisterVenueOwnerUseCase);
   private readonly destroyRef = inject(DestroyRef);
   private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
 
@@ -251,7 +249,7 @@ export class SignUpComponent {
       take(1),
       map(publicKey => this.createRegisterPayload(formValue, publicKey)),
       switchMap(payload => accountType === 'VENUE_OWNER'
-        ? this.registerVenueOwnerUseCase.execute(this.createVenueOwnerRequest(payload))
+        ? this.authService.registerVenueOwner(this.createVenueOwnerRequest(payload))
         : this.authService.register(payload)),
       finalize(() => {
         this.loading.set(false);

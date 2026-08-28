@@ -11,7 +11,6 @@ import {
   provideLucideIcons
 } from '@lucide/angular';
 import { RegisterRequest } from '@application/dto/auth/auth.dto';
-import { RegisterVenueOwnerUseCase } from '@application/usecase/venue-owner-registration/register-venue-owner.usecase';
 import { AuthService } from '@presentation/services/auth.service';
 import { CryptoService } from '@presentation/services/crypto.service';
 import { ToastService } from '@shared/services/toast.service';
@@ -19,14 +18,12 @@ import { SignUpComponent } from './sign-up.component';
 
 describe('SignUpComponent', () => {
   const authService = {
-    register: vi.fn()
+    register: vi.fn(),
+    registerVenueOwner: vi.fn()
   };
   const cryptoService = {
     getPublicKey: vi.fn(),
     encrypt: vi.fn()
-  };
-  const registerVenueOwnerUseCase = {
-    execute: vi.fn()
   };
   const toastService = {
     show: vi.fn()
@@ -36,15 +33,15 @@ describe('SignUpComponent', () => {
 
   beforeEach(async () => {
     authService.register.mockReset();
+    authService.registerVenueOwner.mockReset();
     cryptoService.getPublicKey.mockReset();
     cryptoService.encrypt.mockReset();
-    registerVenueOwnerUseCase.execute.mockReset();
     toastService.show.mockReset();
 
     cryptoService.getPublicKey.mockReturnValue(of('public-key'));
     cryptoService.encrypt.mockImplementation((value: string) => `encrypted-${value}`);
     authService.register.mockReturnValue(of({}));
-    registerVenueOwnerUseCase.execute.mockReturnValue(of(void 0));
+    authService.registerVenueOwner.mockReturnValue(of(void 0));
 
     await TestBed.configureTestingModule({
       imports: [SignUpComponent],
@@ -52,7 +49,6 @@ describe('SignUpComponent', () => {
         provideRouter([]),
         provideLucideIcons(LucideMail, LucideUser, LucideUserCheck, LucideLock),
         { provide: AuthService, useValue: authService },
-        { provide: RegisterVenueOwnerUseCase, useValue: registerVenueOwnerUseCase },
         { provide: CryptoService, useValue: cryptoService },
         { provide: ToastService, useValue: toastService }
       ]
@@ -111,7 +107,7 @@ describe('SignUpComponent', () => {
 
   it('hiển thị popup loading trong khi đăng ký VENUE_OWNER', () => {
     const pendingRegistration = new Subject<void>();
-    registerVenueOwnerUseCase.execute.mockReturnValue(pendingRegistration);
+    authService.registerVenueOwner.mockReturnValue(pendingRegistration);
     const fixture = TestBed.createComponent(SignUpComponent);
     const component = fixture.componentInstance;
     component.setAccountType('VENUE_OWNER');
@@ -213,9 +209,9 @@ describe('SignUpComponent', () => {
       component.register();
       fixture.detectChanges();
 
-      expect(registerVenueOwnerUseCase.execute).toHaveBeenCalledTimes(1);
+      expect(authService.registerVenueOwner).toHaveBeenCalledTimes(1);
       expect(authService.register).not.toHaveBeenCalled();
-      expect(registerVenueOwnerUseCase.execute.mock.calls[0][0]).toMatchObject({
+      expect(authService.registerVenueOwner.mock.calls[0][0]).toMatchObject({
         username: 'goat.player',
         businessName: 'GOAT Arena',
         address: '12 Nguyễn Văn Bảo',
@@ -248,7 +244,7 @@ describe('SignUpComponent', () => {
   });
 
   it('đưa VENUE_OWNER về bước tài khoản khi API báo email trùng', () => {
-    registerVenueOwnerUseCase.execute.mockReturnValue(throwError(() => new HttpErrorResponse({
+    authService.registerVenueOwner.mockReturnValue(throwError(() => new HttpErrorResponse({
       status: 400,
       error: { message: 'Email đã tồn tại' }
     })));

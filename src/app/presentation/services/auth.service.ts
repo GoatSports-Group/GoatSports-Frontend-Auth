@@ -16,6 +16,8 @@ import { ForgotPasswordUseCase } from '@application/usecase/auth/forgot-password
 import { ResendVerificationUseCase } from '@application/usecase/auth/resend-verification.usecase';
 import { RefreshTokenUseCase } from '@application/usecase/auth/refresh-token.usecase';
 import { GetCurrentUserUseCase } from '@application/usecase/auth/get-current-user.usecase';
+import { VenueOwnerRegistrationRequest } from '@application/dto/venue-owner-registration/venue-owner-registration.dto';
+import { RegisterVenueOwnerUseCase } from '@application/usecase/venue-owner-registration/register-venue-owner.usecase';
 
 @Injectable({
   providedIn: 'root'
@@ -31,6 +33,7 @@ export class AuthService {
   private resendVerificationUseCase = inject(ResendVerificationUseCase);
   private refreshTokenUseCase = inject(RefreshTokenUseCase);
   private getCurrentUserUseCase = inject(GetCurrentUserUseCase);
+  private registerVenueOwnerUseCase = inject(RegisterVenueOwnerUseCase);
 
   private isLoggingOut = false;
 
@@ -52,6 +55,10 @@ export class AuthService {
 
   register(payload: RegisterRequest): Observable<User> {
     return this.registerUseCase.execute(payload);
+  }
+
+  registerVenueOwner(payload: VenueOwnerRegistrationRequest): Observable<void> {
+    return this.registerVenueOwnerUseCase.execute(payload);
   }
 
   verify(payload: VerificationRequest): Observable<void> {
