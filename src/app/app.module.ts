@@ -10,8 +10,6 @@ import { NotifyComponent } from '@shared/components/notify/notify.component';
 
 import { AUTH_REPOSITORY_TOKEN } from '@application/ports/auth.repository';
 import { AuthRepositoryImpl } from '@infrastructure/repositories/auth.repository.impl';
-import { VENUE_OWNER_REGISTRATION_REPOSITORY_TOKEN } from '@application/ports/venue-owner-registration.repository';
-import { VenueOwnerRegistrationRepositoryImpl } from '@infrastructure/repositories/venue-owner-registration.repository.impl';
 import {
   provideLucideIcons,
   LucideMail,
@@ -34,10 +32,6 @@ import {
   ],
   providers: [
     { provide: AUTH_REPOSITORY_TOKEN, useClass: AuthRepositoryImpl },
-    {
-      provide: VENUE_OWNER_REGISTRATION_REPOSITORY_TOKEN,
-      useClass: VenueOwnerRegistrationRepositoryImpl
-    },
     {
       provide: IMAGE_CONFIG,
       useValue: {

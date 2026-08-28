@@ -9,7 +9,10 @@ export type LoginRequest = {
   password: string;
 };
 
+export type RegistrationAccountType = 'PLAYER' | 'VENUE_OWNER';
+
 export type RegisterRequest = {
+  accountType: RegistrationAccountType;
   username: string;
   fullName: string;
   email: string;

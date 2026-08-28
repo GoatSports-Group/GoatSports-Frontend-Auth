@@ -1,5 +1,5 @@
 import { Injectable, inject } from '@angular/core';
-import { Observable, switchMap, tap } from 'rxjs';
+import { Observable, tap } from 'rxjs';
 import { Router } from '@angular/router';
 import { SessionStateService } from '@presentation/services/session-state.service';
 import {
@@ -16,14 +16,6 @@ import { ForgotPasswordUseCase } from '@application/usecase/auth/forgot-password
 import { ResendVerificationUseCase } from '@application/usecase/auth/resend-verification.usecase';
 import { RefreshTokenUseCase } from '@application/usecase/auth/refresh-token.usecase';
 import { GetCurrentUserUseCase } from '@application/usecase/auth/get-current-user.usecase';
-import {
-  VenueOwnerAccountRegistrationRequest,
-  VenueOwnerApplicationSubmissionRequest,
-  VenueOwnerRegistrationSession
-} from '@application/dto/venue-owner-registration/venue-owner-registration.dto';
-import { RegisterVenueOwnerUseCase } from '@application/usecase/venue-owner-registration/register-venue-owner.usecase';
-import { ContinueVenueOwnerRegistrationUseCase } from '@application/usecase/venue-owner-registration/continue-venue-owner-registration.usecase';
-import { SubmitVenueOwnerApplicationUseCase } from '@application/usecase/venue-owner-registration/submit-venue-owner-application.usecase';
 
 @Injectable({
   providedIn: 'root'
@@ -39,9 +31,6 @@ export class AuthService {
   private resendVerificationUseCase = inject(ResendVerificationUseCase);
   private refreshTokenUseCase = inject(RefreshTokenUseCase);
   private getCurrentUserUseCase = inject(GetCurrentUserUseCase);
-  private registerVenueOwnerUseCase = inject(RegisterVenueOwnerUseCase);
-  private continueVenueOwnerRegistrationUseCase = inject(ContinueVenueOwnerRegistrationUseCase);
-  private submitVenueOwnerApplicationUseCase = inject(SubmitVenueOwnerApplicationUseCase);
 
   private isLoggingOut = false;
 
@@ -63,28 +52,6 @@ export class AuthService {
 
   register(payload: RegisterRequest): Observable<User> {
     return this.registerUseCase.execute(payload);
-  }
-
-  startVenueOwnerRegistration(
-    payload: VenueOwnerAccountRegistrationRequest
-  ): Observable<VenueOwnerRegistrationSession> {
-    return this.registerVenueOwnerUseCase.execute(payload);
-  }
-
-  verifyVenueOwnerEmail(
-    payload: VerificationRequest,
-    session: VenueOwnerRegistrationSession
-  ): Observable<VenueOwnerRegistrationSession> {
-    return this.verifyUseCase.execute(payload).pipe(
-      switchMap(() => this.continueVenueOwnerRegistrationUseCase.execute(session))
-    );
-  }
-
-  submitVenueOwnerApplication(
-    session: VenueOwnerRegistrationSession,
-    payload: VenueOwnerApplicationSubmissionRequest
-  ): Observable<void> {
-    return this.submitVenueOwnerApplicationUseCase.execute(session, payload);
   }
 
   verify(payload: VerificationRequest): Observable<void> {
