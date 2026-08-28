@@ -1,5 +1,5 @@
 <div
-  class="h-dvh w-full flex flex-col items-center justify-center bg-slate-50/40 font-sports-body relative px-4 sm:px-8 overflow-hidden">
+  class="h-dvh min-h-0 w-full flex flex-col items-center bg-slate-50/40 font-sports-body relative px-3 py-4 sm:px-8 overflow-x-hidden overflow-y-auto">
 
   <!-- Interactive 3D perspective grid canvas -->
   <canvas id="auth-canvas" class="absolute inset-0 w-full h-full pointer-events-none opacity-80 z-0"></canvas>
@@ -40,29 +40,31 @@
     </div>
   </div>
 
-  <!-- Clean, soft ambient background details for the form area (enriched colors for glassmorphism refraction) -->
-  <div
-    class="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] bg-emerald-200/25 rounded-full filter blur-[130px] pointer-events-none z-0">
-  </div>
-  <div
-    class="absolute bottom-1/4 left-1/2 -translate-x-1/2 translate-y-1/2 w-[750px] h-[750px] bg-sky-200/25 rounded-full filter blur-[150px] pointer-events-none z-0">
+  <!-- Decorative glows are clipped so they never create page overflow. -->
+  <div class="absolute inset-0 overflow-hidden pointer-events-none z-0">
+    <div
+      class="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] bg-emerald-200/25 rounded-full filter blur-[130px]">
+    </div>
+    <div
+      class="absolute bottom-1/4 left-1/2 -translate-x-1/2 translate-y-1/2 w-[750px] h-[750px] bg-sky-200/25 rounded-full filter blur-[150px]">
+    </div>
   </div>
 
   <!-- Centered Branding and Form Card -->
-  <div class="w-full max-w-[580px] flex flex-col items-center gap-6 z-10 relative">
+  <div class="my-auto w-full min-w-0 max-w-[620px] flex flex-col items-center gap-4 sm:gap-6 z-10 relative">
 
     <!-- Centered Brand Logo with high-end athletic tracking -->
     <a (click)="navigateToHome()"
       class="flex items-center gap-3.5 cursor-pointer select-none group transition-all duration-300">
       <img src="assets/images/goat.png" alt="Goat Sports Logo"
-        class="h-20 w-full object-contain transition-all duration-500 group-hover:scale-105">
-      <span class="font-sports-display font-extrabold text-3xl tracking-[0.2em] uppercase text-slate-800">
+        class="h-14 sm:h-20 w-auto max-w-20 object-contain transition-all duration-500 group-hover:scale-105">
+      <span class="font-sports-display font-extrabold text-2xl sm:text-3xl tracking-[0.12em] sm:tracking-[0.2em] uppercase text-slate-800">
         GOAT<span class="text-emerald-600 font-black">SPORTS</span>
       </span>
     </a>
 
     <!-- Router content wrapper with 3D Card Hover Tilt triggers -->
-    <div id="auth-card-wrapper" class="w-full">
+    <div id="auth-card-wrapper" class="w-full min-w-0 max-w-full">
       <router-outlet></router-outlet>
     </div>
 

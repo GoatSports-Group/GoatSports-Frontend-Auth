@@ -1,0 +1,22 @@
+<nav class="journey-stepper" aria-label="Tiến trình đăng ký chủ sân">
+  <div class="journey-stepper__track" aria-hidden="true">
+    <span class="journey-stepper__progress" [style.width.%]="progress()"></span>
+  </div>
+
+  @for (step of steps; track step.number) {
+    <button
+      type="button"
+      class="journey-stepper__step"
+      [class.is-active]="step.number === currentStep()"
+      [class.is-complete]="step.number < currentStep()"
+      [class.is-navigable]="maxNavigableStep() > 0 && step.number <= maxNavigableStep()"
+      [attr.aria-current]="step.number === currentStep() ? 'step' : null"
+      [attr.aria-disabled]="maxNavigableStep() === 0 || step.number > maxNavigableStep()"
+      (click)="selectStep(step.number)">
+      <span class="journey-stepper__number">
+        {{ step.number < currentStep() ? '✓' : step.number }}
+      </span>
+      <span class="journey-stepper__title">{{ step.title }}</span>
+    </button>
+  }
+</nav>

@@ -1,0 +1,104 @@
+:host {
+  display: block;
+  min-width: 0;
+}
+
+.journey-stepper {
+  position: relative;
+  display: grid;
+  min-width: 0;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+
+.journey-stepper__track {
+  position: absolute;
+  top: 19px;
+  left: 10%;
+  width: 80%;
+  height: 2px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #dbe4e1;
+}
+
+.journey-stepper__progress {
+  display: block;
+  height: 100%;
+  background: #059669;
+  transition: width 200ms ease;
+}
+
+.journey-stepper__step {
+  position: relative;
+  display: grid;
+  min-width: 0;
+  justify-items: center;
+  gap: 8px;
+  padding: 0 3px;
+  border: 0;
+  background: transparent;
+  color: #94a3b8;
+  font-family: 'Be Vietnam Pro', sans-serif;
+  font-size: 11px;
+  font-weight: 650;
+  line-height: 1.35;
+  text-align: center;
+}
+
+.journey-stepper__step.is-navigable {
+  cursor: pointer;
+}
+
+.journey-stepper__step:focus-visible {
+  border-radius: 10px;
+  outline: 2px solid #059669;
+  outline-offset: 3px;
+}
+
+.journey-stepper__number {
+  display: grid;
+  z-index: 1;
+  width: 40px;
+  height: 40px;
+  place-items: center;
+  border: 2px solid #dbe4e1;
+  border-radius: 50%;
+  background: #fff;
+  color: #94a3b8;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.journey-stepper__step.is-active,
+.journey-stepper__step.is-complete {
+  color: #047857;
+}
+
+.journey-stepper__step.is-active .journey-stepper__number {
+  border-color: #059669;
+  color: #047857;
+  box-shadow: 0 0 0 4px rgb(5 150 105 / 11%);
+}
+
+.journey-stepper__step.is-complete .journey-stepper__number {
+  border-color: #059669;
+  background: #059669;
+  color: #fff;
+}
+
+@media (max-width: 480px) {
+  .journey-stepper__step {
+    gap: 6px;
+    padding: 0 1px;
+    font-size: 9.5px;
+  }
+
+  .journey-stepper__number {
+    width: 36px;
+    height: 36px;
+  }
+
+  .journey-stepper__track {
+    top: 17px;
+  }
+}

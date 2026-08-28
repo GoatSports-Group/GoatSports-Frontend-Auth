@@ -19,6 +19,8 @@ import { FormFieldComponent } from '../form-field/form-field.component';
 })
 export class PasswordInputComponent implements ControlValueAccessor {
   label = input<string>('Mật khẩu');
+  fieldId = input<string>('');
+  errorId = input<string>('');
   placeholder = input<string>('••••••••');
   autocomplete = input<string>('current-password');
   showError = input<boolean>(false);
@@ -29,22 +31,22 @@ export class PasswordInputComponent implements ControlValueAccessor {
   disabled = false;
   hidePassword = signal(true);
 
-  onChange: any = () => {};
-  onTouched: any = () => {};
+  onChange: (value: string) => void = () => {};
+  onTouched: () => void = () => {};
 
-  writeValue(val: any): void {
-    this.value = val || '';
+  writeValue(value: string | null): void {
+    this.value = value ?? '';
   }
 
-  registerOnChange(fn: any): void {
+  registerOnChange(fn: (value: string) => void): void {
     this.onChange = fn;
   }
 
-  registerOnTouched(fn: any): void {
+  registerOnTouched(fn: () => void): void {
     this.onTouched = fn;
   }
 
-  setDisabledState?(isDisabled: boolean): void {
+  setDisabledState(isDisabled: boolean): void {
     this.disabled = isDisabled;
   }
 
@@ -55,6 +57,7 @@ export class PasswordInputComponent implements ControlValueAccessor {
   }
 
   togglePasswordVisibility(): void {
+    if (this.disabled) return;
     this.hidePassword.update(val => !val);
   }
 }

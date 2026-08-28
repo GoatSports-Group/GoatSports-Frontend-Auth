@@ -9,6 +9,7 @@ import { environment } from "@environments/environment";
 import { AuthCardComponent } from '@shared/components/auth-card/auth-card.component';
 import { FormFieldComponent } from '@shared/components/form-field/form-field.component';
 import { SubmitButtonComponent } from '@shared/components/submit-button/submit-button.component';
+import { RegistrationJourneyStepperComponent } from '@shared/components/registration-journey-stepper/registration-journey-stepper.component';
 
 @Component({
   selector: 'app-verify',
@@ -20,7 +21,8 @@ import { SubmitButtonComponent } from '@shared/components/submit-button/submit-b
     ReactiveFormsModule,
     AuthCardComponent,
     FormFieldComponent,
-    SubmitButtonComponent
+    SubmitButtonComponent,
+    RegistrationJourneyStepperComponent
   ]
 })
 export class VerifyComponent implements OnInit, OnDestroy {
@@ -34,6 +36,7 @@ export class VerifyComponent implements OnInit, OnDestroy {
   loading = signal(false);
   otp = signal<string[]>(['', '', '', '', '', '']);
   countdown = signal(60);
+  isVenueOwner = signal(false);
   private timer: any;
 
   isOtpComplete = computed(() => {
@@ -46,6 +49,7 @@ export class VerifyComponent implements OnInit, OnDestroy {
     });
 
     this.route.queryParams.subscribe(params => {
+      this.isVenueOwner.set(params['accountType']?.toUpperCase() === 'VENUE_OWNER');
       if (params['email']) {
         this.verifyForm.patchValue({ email: params['email'] });
       }

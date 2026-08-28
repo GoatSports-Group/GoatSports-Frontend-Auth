@@ -1,5 +1,5 @@
-<button type="submit" [disabled]="disabled() || loading()"
-  class="w-full py-3.5 rounded-2xl font-sports-display font-extrabold text-[15px] tracking-wide uppercase text-white shadow-md shadow-emerald-650/10 bg-emerald-600 hover:bg-emerald-700 hover:shadow-lg hover:shadow-emerald-600/20 transition-all duration-300 active:scale-[0.99] disabled:opacity-50 disabled:pointer-events-none disabled:shadow-none focus:outline-none cursor-pointer">
+<button type="submit" [disabled]="disabled() || loading()" [attr.aria-busy]="loading()"
+  class="w-full py-3.5 rounded-2xl font-sports-display font-extrabold text-[15px] tracking-wide uppercase text-white shadow-md shadow-emerald-650/10 bg-emerald-600 hover:bg-emerald-700 hover:shadow-lg hover:shadow-emerald-600/20 transition-all duration-300 active:scale-[0.99] disabled:opacity-50 disabled:pointer-events-none disabled:shadow-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-600 focus-visible:ring-offset-2 cursor-pointer">
   @if (loading()) {
   <span class="flex items-center justify-center gap-2">
     <svg class="animate-spin h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">

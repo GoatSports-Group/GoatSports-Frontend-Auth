@@ -47,19 +47,7 @@ export class SignInComponent implements OnInit {
     this.authService.sessionReady$.subscribe(ready => {
       if (ready && this.authService.isAuthenticated) {
         const user = this.authService.currentUser;
-        const roleName = (user?.role?.name || '').toUpperCase();
-        const isAdmin = roleName === 'ADMIN';
-
-        if (isAdmin) {
-          window.location.href = environment.adminApiUrl;
-        } else {
-          const redirectUrl = this.route.snapshot.queryParams['redirect'];
-          if (redirectUrl) {
-            window.location.href = redirectUrl;
-          } else {
-            window.location.href = environment.clientApiUrl;
-          }
-        }
+        window.location.href = this.resolvePostLoginDestination(user);
       }
     });
   }
@@ -87,24 +75,7 @@ export class SignInComponent implements OnInit {
             this.toastService.show(`Chào mừng ${user?.fullName || user?.username} đã quay trở lại!`, 'success');
 
             setTimeout(() => {
-              const roleName = (user?.role?.name || '').toUpperCase();
-              const isAdmin = roleName === 'ADMIN';
-
-              if (isAdmin) {
-                const redirectUrl = this.route.snapshot.queryParams['redirect'];
-                if (redirectUrl && redirectUrl.includes('localhost:4300')) {
-                  window.location.href = redirectUrl;
-                } else {
-                  window.location.href = `${environment.adminApiUrl}/admin`;
-                }
-              } else {
-                const redirectUrl = this.route.snapshot.queryParams['redirect'];
-                if (redirectUrl) {
-                  window.location.href = redirectUrl;
-                } else {
-                  window.location.href = environment.clientApiUrl;
-                }
-              }
+              window.location.href = this.resolvePostLoginDestination(user);
             }, 1000);
           },
           error: (err: HttpErrorResponse) => {
@@ -151,5 +122,16 @@ export class SignInComponent implements OnInit {
       + `&kc_idp_hint=google`;
 
     window.location.href = authUrl;
+  }
+
+  private resolvePostLoginDestination(user: { role?: { name?: string } } | null | undefined): string {
+    const roleName = (user?.role?.name || '').toUpperCase();
+    const redirectUrl = this.route.snapshot.queryParams['redirect'];
+
+    if (roleName === 'ADMIN' || roleName === 'VENUE_OWNER') {
+      return redirectUrl || `${environment.adminApiUrl}/admin/dashboard`;
+    }
+
+    return redirectUrl || environment.clientApiUrl;
   }
 }

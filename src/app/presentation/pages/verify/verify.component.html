@@ -1,9 +1,19 @@
 <app-auth-card [loading]="loading()">
 
+  @if (isVenueOwner()) {
+    <div class="mb-7 rounded-3xl border border-emerald-100 bg-gradient-to-b from-emerald-50/80 to-white px-4 py-5 sm:px-5">
+      <p class="mb-4 text-center text-[11px] font-semibold uppercase tracking-[0.14em] text-emerald-700">
+        Hành trình trở thành đối tác chủ sân
+      </p>
+      <app-registration-journey-stepper [currentStep]="3" />
+    </div>
+  }
+
   <!-- Header Title -->
-  <div class="flex flex-col items-center text-center mb-8">
-    <h2 class="text-3xl font-black text-emerald-600 tracking-tight uppercase font-sports-display mb-2">Nhập mã xác thực</h2>
-    <p class="text-[14px] font-bold text-slate-500 font-sports-body">Chúng tôi đã gửi mã 6 chữ số đến email của bạn.</p>
+  <div class="mb-8 flex flex-col items-center text-center">
+    <p class="mb-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-emerald-700">Bảo vệ tài khoản của bạn</p>
+    <h1 class="mb-2 text-[28px] font-extrabold leading-tight tracking-[-0.025em] text-slate-900 font-sports-display">Nhập mã xác thực</h1>
+    <p class="max-w-md text-sm font-medium leading-6 text-slate-600 font-sports-body">Chúng tôi đã gửi mã gồm 6 chữ số đến email đăng ký của bạn.</p>
   </div>
 
   <!-- Form Content -->
@@ -21,7 +31,7 @@
 
       <!-- OTP Label and inputs -->
       <div class="w-full text-left space-y-2.5">
-        <label class="block text-[13px] font-extrabold uppercase tracking-wide text-slate-700 font-sports-display">Mã xác thực OTP</label>
+        <label class="block text-[13px] font-semibold tracking-wide text-slate-700 font-sports-display">Mã xác thực OTP</label>
         <div class="flex justify-between gap-2.5 my-1 w-full">
           @for (digit of [0, 1, 2, 3, 4, 5]; track $index) {
           <input type="text" maxlength="1"

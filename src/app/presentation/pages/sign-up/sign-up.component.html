@@ -1,123 +1,329 @@
 <app-auth-card [loading]="loading()">
-
-  <!-- Header Title -->
-  <div class="flex flex-col items-center text-center mb-8">
-    <h2 class="text-3xl font-black text-emerald-600 tracking-tight uppercase font-sports-display mb-2">Đăng Ký</h2>
-    <p class="text-[14px] font-bold text-slate-500 font-sports-body">Tạo tài khoản mới để tham gia cùng đồng đội</p>
-  </div>
-
-  <!-- Form Content -->
-  <div class="space-y-6 font-sports-body">
-    <form [formGroup]="signUpForm" (ngSubmit)="register()" class="space-y-5">
-
-      <!-- Full Name Field -->
-      <app-form-field
-        label="Họ và Tên"
-        icon="user"
-        [showError]="!!(signUpForm.get('fullName')?.touched && signUpForm.get('fullName')?.invalid)"
-        errorMessage="Bắt buộc">
-        <input type="text" formControlName="fullName" required autocomplete="name"
-          [class.border-rose-350]="signUpForm.get('fullName')?.touched && signUpForm.get('fullName')?.invalid"
-          class="w-full pl-11.5 pr-4 py-3.5 rounded-2xl border border-slate-300 bg-white/60 backdrop-blur-md focus:bg-white focus:outline-none focus:ring-4 focus:ring-emerald-500/5 focus:border-emerald-500 text-[15px] font-bold text-slate-900 placeholder-slate-500 transition-all duration-300 hover:border-slate-400"
-          placeholder="Họ và tên của bạn">
-      </app-form-field>
-
-      <!-- Username Field -->
-      <app-form-field
-        label="Tên đăng nhập"
-        icon="user-check"
-        [showError]="!!(signUpForm.get('username')?.touched && signUpForm.get('username')?.invalid)"
-        errorMessage="Tối thiểu 3 ký tự">
-        <input type="text" formControlName="username" required autocomplete="username"
-          [class.border-rose-350]="signUpForm.get('username')?.touched && signUpForm.get('username')?.invalid"
-          class="w-full pl-11.5 pr-4 py-3.5 rounded-2xl border border-slate-300 bg-white/60 backdrop-blur-md focus:bg-white focus:outline-none focus:ring-4 focus:ring-emerald-500/5 focus:border-emerald-500 text-[15px] font-bold text-slate-900 placeholder-slate-500 transition-all duration-300 hover:border-slate-400"
-          placeholder="Tên đăng nhập">
-      </app-form-field>
-
-      <!-- Email Field -->
-      <app-form-field
-        label="Email"
-        icon="mail"
-        [showError]="!!(signUpForm.get('email')?.touched && signUpForm.get('email')?.invalid)"
-        errorMessage="Email chưa đúng">
-        <input type="email" formControlName="email" required autocomplete="email"
-          [class.border-rose-350]="signUpForm.get('email')?.touched && signUpForm.get('email')?.invalid"
-          class="w-full pl-11.5 pr-4 py-3.5 rounded-2xl border border-slate-300 bg-white/60 backdrop-blur-md focus:bg-white focus:outline-none focus:ring-4 focus:ring-emerald-500/5 focus:border-emerald-500 text-[15px] font-bold text-slate-900 placeholder-slate-500 transition-all duration-300 hover:border-slate-400"
-          placeholder="example@gmail.com">
-      </app-form-field>
-
-      <!-- Password Grid -->
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <!-- Password Field -->
-        <app-password-input
-          formControlName="password"
-          label="Mật khẩu"
-          placeholder="••••••••••••••••"
-          autocomplete="new-password"
-          [showError]="!!(signUpForm.get('password')?.touched && signUpForm.get('password')?.invalid)"
-          errorMessage="Yếu"
-          errorClass="border-rose-355"
-        />
-
-        <!-- Confirm Password Field -->
-        <app-password-input
-          formControlName="confirmPassword"
-          label="Xác nhận mật khẩu"
-          placeholder="••••••••••••••••"
-          autocomplete="new-password"
-          [showError]="!!(signUpForm.get('confirmPassword')?.touched && signUpForm.get('confirmPassword')?.invalid)"
-          errorMessage="Không khớp"
-          errorClass="border-rose-350"
-        />
-      </div>
-
-      <!-- Password Strength Meter — Full width, outside the grid -->
-      <div class="space-y-1.5">
-        <div class="flex justify-between items-center text-[12px]">
-          <span class="text-slate-500 font-extrabold uppercase tracking-wider font-sports-display">Độ mạnh mật khẩu</span>
-          <span class="font-extrabold font-sports-display uppercase tracking-wider text-[10px]" [class]="passwordStrength() === 0 ? 'text-slate-500' :
-                         passwordStrength() === 1 ? 'text-rose-600 font-black' :
-                         passwordStrength() === 2 ? 'text-amber-600 font-black' :
-                         passwordStrength() === 3 ? 'text-yellow-600 font-black' :
-                         'text-emerald-600 font-black'">
-            {{ passwordStrength() === 0 ? '' :
-            passwordStrength() === 1 ? 'Yếu' :
-            passwordStrength() === 2 ? 'Vừa' :
-            passwordStrength() === 3 ? 'Mạnh' : 'Tuyệt vời' }}
-          </span>
-        </div>
-        <div class="grid grid-cols-4 gap-1.5 h-1.5 w-full bg-slate-200/60 rounded-full overflow-hidden">
-          <div class="h-full rounded-full transition-all duration-300"
-            [class]="passwordStrength() >= 1 ? (passwordStrength() === 1 ? 'bg-rose-500' : passwordStrength() === 2 ? 'bg-amber-500' : passwordStrength() === 3 ? 'bg-yellow-500' : 'bg-emerald-500') : 'bg-transparent'">
-          </div>
-          <div class="h-full rounded-full transition-all duration-300"
-            [class]="passwordStrength() >= 2 ? (passwordStrength() === 2 ? 'bg-amber-500' : passwordStrength() === 3 ? 'bg-yellow-500' : 'bg-emerald-500') : 'bg-transparent'">
-          </div>
-          <div class="h-full rounded-full transition-all duration-300"
-            [class]="passwordStrength() >= 3 ? (passwordStrength() === 3 ? 'bg-yellow-500' : 'bg-emerald-500') : 'bg-transparent'">
-          </div>
-          <div class="h-full rounded-full transition-all duration-300"
-            [class]="passwordStrength() >= 4 ? 'bg-emerald-500' : 'bg-transparent'"></div>
-        </div>
-      </div>
-
-      <!-- Action Button -->
-      <app-submit-button
-        label="Đăng Ký"
-        loadingLabel="Đang tạo tài khoản..."
-        [loading]="loading()"
-        [disabled]="signUpForm.invalid"
-      />
-
-    </form>
-  </div>
-
-  <!-- Card Footer -->
-  <div class="mt-8 pt-6 border-t border-slate-200 text-center font-sports-body">
-    <p class="text-[14px] font-bold text-slate-500">
-      Đã có tài khoản? <a (click)="navigateToSignIn()"
-        class="font-extrabold text-emerald-600 hover:text-emerald-700 hover:underline cursor-pointer transition-colors">Đăng nhập</a>
+  <div class="mb-6 flex flex-col items-center text-center">
+    <p class="mb-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-emerald-700 font-sports-display">
+      Bắt đầu hành trình của bạn
+    </p>
+    <h1
+      class="text-[28px] font-extrabold leading-tight tracking-[-0.025em] text-slate-900 sm:text-[32px] font-sports-display">
+      Đăng ký tài khoản
+    </h1>
+    <p
+      class="mt-2 max-w-full break-words text-[13px] font-medium leading-6 text-slate-600 sm:max-w-md sm:text-sm font-sports-body">
+      Chọn loại tài khoản, nhập thông tin và xác thực email để tiếp tục.
     </p>
   </div>
 
+  <div class="mb-5 grid grid-cols-1 gap-1.5 rounded-2xl border border-slate-200/80 bg-slate-100/90 p-1.5 sm:grid-cols-2"
+    role="tablist" aria-label="Loại tài khoản đăng ký">
+    <button type="button" role="tab" aria-controls="registration-form" [attr.aria-selected]="accountType() === 'PLAYER'"
+      [disabled]="loading() || registrationSucceeded()" (click)="setAccountType('PLAYER')"
+      [class]="accountType() === 'PLAYER'
+        ? 'flex min-h-11 items-center justify-center gap-2 rounded-xl bg-white px-3 py-2.5 text-[13px] font-black text-emerald-700 shadow-sm transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-600 focus-visible:ring-offset-2 sm:text-sm'
+        : 'flex min-h-11 items-center justify-center gap-2 rounded-xl px-3 py-2.5 text-[13px] font-bold text-slate-600 transition-all hover:bg-white/60 hover:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-600 focus-visible:ring-offset-2 sm:text-sm'">
+      <svg class="h-4 w-4 shrink-0" aria-hidden="true" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+          d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+      </svg>
+      Người chơi
+    </button>
+
+    <button type="button" role="tab" aria-controls="registration-form"
+      [attr.aria-selected]="accountType() === 'VENUE_OWNER'" [disabled]="loading() || registrationSucceeded()"
+      (click)="setAccountType('VENUE_OWNER')"
+      [class]="accountType() === 'VENUE_OWNER'
+        ? 'flex min-h-11 items-center justify-center gap-2 rounded-xl bg-emerald-600 px-3 py-2.5 text-[13px] font-black text-white shadow-md transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-600 focus-visible:ring-offset-2 sm:text-sm'
+        : 'flex min-h-11 items-center justify-center gap-2 rounded-xl px-3 py-2.5 text-[13px] font-bold text-slate-600 transition-all hover:bg-white/60 hover:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-600 focus-visible:ring-offset-2 sm:text-sm'">
+      <svg class="h-4 w-4 shrink-0" aria-hidden="true" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+          d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+      </svg>
+      Đối tác chủ sân
+    </button>
+  </div>
+
+  @if (accountType() === 'VENUE_OWNER' && !registrationSucceeded()) {
+  <div class="mb-5 flex items-start gap-3 rounded-2xl border border-emerald-200 bg-emerald-50/90 p-3.5" role="note">
+    <div class="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-emerald-600 text-white">
+      <svg class="h-4 w-4" aria-hidden="true" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+          d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+      </svg>
+    </div>
+    <div class="min-w-0">
+      <h2 class="text-xs font-bold tracking-wide text-emerald-950">Hành trình dành cho đối tác chủ sân</h2>
+      <p class="mt-1 break-words text-xs font-normal leading-5 text-emerald-800">
+        Hoàn tất một lần theo workflow: tạo tài khoản chủ sân, và tạo đơn của sân.
+      </p>
+    </div>
+  </div>
+
+  <app-registration-journey-stepper class="mb-6" data-testid="owner-registration-stepper" [currentStep]="ownerStep()"
+    [maxNavigableStep]="ownerStep()" (stepChange)="goToOwnerStep($event)" />
+  }
+
+  @if (apiError()) {
+  <div id="registration-api-error" class="mb-5 rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3" role="alert"
+    aria-live="assertive">
+    <p class="text-sm font-bold leading-5 text-rose-800">{{ apiError() }}</p>
+  </div>
+  }
+
+  @if (registrationSucceeded()) {
+  <div class="rounded-2xl border border-emerald-200 bg-emerald-50 px-5 py-6 text-center" role="status"
+    aria-live="polite">
+    <div
+      class="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-emerald-600 text-white shadow-lg shadow-emerald-600/20">
+      <svg class="h-6 w-6" aria-hidden="true" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
+      </svg>
+    </div>
+    <h2 class="mt-4 text-lg font-black text-emerald-950 font-sports-display">Đăng ký thành công</h2>
+    <p class="mt-2 text-sm font-semibold leading-6 text-emerald-800">{{ successMessage() }}</p>
+    <p class="mt-3 text-xs font-bold uppercase tracking-wide text-emerald-700">
+      {{ accountType() === 'VENUE_OWNER' ? 'Đang chuyển đến trang đăng nhập…' : 'Đang chuyển đến trang xác thực email…'
+      }}
+    </p>
+  </div>
+  } @else {
+  <form id="registration-form" class="min-w-0 max-w-full space-y-5 font-sports-body" [formGroup]="signUpForm"
+    [attr.aria-busy]="loading()" [attr.aria-describedby]="apiError() ? 'registration-api-error' : null"
+    (ngSubmit)="register()" novalidate>
+
+    @if (accountType() === 'VENUE_OWNER') {
+    <header class="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
+      <h2 id="owner-step-title" class="text-base font-black text-slate-900 outline-none font-sports-display"
+        tabindex="-1">
+        {{ ownerStepTitle() }}
+      </h2>
+      <p class="mt-1 text-xs font-semibold text-slate-600">
+        Bước {{ ownerStep() }}/5 • {{ ownerStepDescription() }}
+      </p>
+    </header>
+    }
+
+    @if (accountType() === 'PLAYER' || ownerStep() === 1) {
+    <app-form-field fieldId="register-fullName" errorId="register-fullName-error"
+      [label]="accountType() === 'VENUE_OWNER' ? 'Họ và tên người đại diện' : 'Họ và tên'" icon="user"
+      [showError]="!!fullNameError()" [errorMessage]="fullNameError()">
+      <input id="register-fullName" type="text" formControlName="fullName" autocomplete="name"
+        [attr.aria-invalid]="!!fullNameError()"
+        [attr.aria-describedby]="fullNameError() ? 'register-fullName-error' : null"
+        [class.border-rose-400]="!!fullNameError()"
+        class="w-full min-w-0 max-w-full rounded-2xl border border-slate-300 bg-white/70 py-3.5 pl-11.5 pr-4 text-[15px] font-bold text-slate-900 placeholder-slate-500 transition-all duration-200 hover:border-slate-400 focus:border-emerald-500 focus:bg-white focus:outline-none focus:ring-4 focus:ring-emerald-500/10"
+        [placeholder]="accountType() === 'VENUE_OWNER' ? 'Họ tên người đại diện' : 'Họ và tên của bạn'">
+    </app-form-field>
+
+    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+      <app-form-field fieldId="register-username" errorId="register-username-error" label="Tên đăng nhập"
+        icon="user-check" [showError]="!!usernameError()" [errorMessage]="usernameError()">
+        <input id="register-username" type="text" formControlName="username" autocomplete="username"
+          autocapitalize="none" spellcheck="false" [attr.aria-invalid]="!!usernameError()"
+          [attr.aria-describedby]="usernameError() ? 'register-username-error' : null"
+          [class.border-rose-400]="!!usernameError()"
+          class="w-full min-w-0 max-w-full rounded-2xl border border-slate-300 bg-white/70 py-3.5 pl-11.5 pr-4 text-[15px] font-bold text-slate-900 placeholder-slate-500 transition-all duration-200 hover:border-slate-400 focus:border-emerald-500 focus:bg-white focus:outline-none focus:ring-4 focus:ring-emerald-500/10"
+          placeholder="Ví dụ: goatsport01">
+      </app-form-field>
+
+      <app-form-field fieldId="register-email" errorId="register-email-error" label="Email" icon="mail"
+        [showError]="!!emailError()" [errorMessage]="emailError()">
+        <input id="register-email" type="email" formControlName="email" autocomplete="email" autocapitalize="none"
+          spellcheck="false" inputmode="email" [attr.aria-invalid]="!!emailError()"
+          [attr.aria-describedby]="emailError() ? 'register-email-error' : null"
+          [class.border-rose-400]="!!emailError()"
+          class="w-full min-w-0 max-w-full rounded-2xl border border-slate-300 bg-white/70 py-3.5 pl-11.5 pr-4 text-[15px] font-bold text-slate-900 placeholder-slate-500 transition-all duration-200 hover:border-slate-400 focus:border-emerald-500 focus:bg-white focus:outline-none focus:ring-4 focus:ring-emerald-500/10"
+          placeholder="ban@example.com">
+      </app-form-field>
+    </div>
+
+    @if (accountType() === 'VENUE_OWNER') {
+    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2" [formGroup]="ownerForm">
+      <label class="block text-sm font-extrabold text-slate-700">
+        Số điện thoại
+        <input id="register-phone" formControlName="phone" type="tel" autocomplete="tel"
+          class="mt-2 w-full rounded-2xl border border-slate-300 bg-white px-4 py-3.5 text-[15px] font-bold text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10"
+          placeholder="0901234567" [attr.aria-invalid]="!!ownerFieldError('phone')">
+        @if (ownerFieldError('phone')) { <span class="mt-1.5 block text-xs font-bold text-rose-700">{{
+          ownerFieldError('phone') }}</span> }
+      </label>
+      <label class="block text-sm font-extrabold text-slate-700">
+        CCCD / Hộ chiếu
+        <input id="register-identityNumber" formControlName="identityNumber" type="text"
+          class="mt-2 w-full rounded-2xl border border-slate-300 bg-white px-4 py-3.5 text-[15px] font-bold text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10"
+          placeholder="Số giấy tờ người đại diện" [attr.aria-invalid]="!!ownerFieldError('identityNumber')">
+        @if (ownerFieldError('identityNumber')) { <span class="mt-1.5 block text-xs font-bold text-rose-700">{{
+          ownerFieldError('identityNumber') }}</span> }
+      </label>
+    </div>
+    }
+    }
+
+    @if (accountType() === 'PLAYER' || ownerStep() === 2) {
+    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+      <app-password-input formControlName="password" fieldId="register-password" errorId="register-password-error"
+        label="Mật khẩu" placeholder="••••••••" autocomplete="new-password" [showError]="!!passwordError()"
+        [errorMessage]="passwordError()" errorClass="border-rose-400" />
+
+      <app-password-input formControlName="confirmPassword" fieldId="register-confirmPassword"
+        errorId="register-confirmPassword-error" label="Xác nhận mật khẩu" placeholder="••••••••"
+        autocomplete="new-password" [showError]="!!confirmPasswordError()" [errorMessage]="confirmPasswordError()"
+        errorClass="border-rose-400" />
+    </div>
+
+    <div class="space-y-2 rounded-2xl bg-slate-50 px-4 py-3" aria-live="polite">
+      <div class="flex items-center justify-between gap-3 text-[11px]">
+        <span class="font-extrabold uppercase tracking-wider text-slate-600 font-sports-display">Độ mạnh mật khẩu</span>
+        <span class="font-black uppercase tracking-wider font-sports-display" [class]="passwordStrength() === 0 ? 'text-slate-500' :
+              passwordStrength() === 1 ? 'text-rose-600' :
+              passwordStrength() === 2 ? 'text-amber-600' :
+              passwordStrength() === 3 ? 'text-yellow-700' : 'text-emerald-700'">
+          {{ passwordStrength() === 0 ? 'Chưa nhập' : passwordStrength() === 1 ? 'Yếu' : passwordStrength() === 2 ?
+          'Trung bình' : passwordStrength() === 3 ? 'Mạnh' : 'Rất mạnh' }}
+        </span>
+      </div>
+      <div class="grid h-1.5 grid-cols-4 gap-1.5 overflow-hidden rounded-full bg-slate-200" aria-hidden="true">
+        @for (segment of [1, 2, 3, 4]; track segment) {
+        <div class="h-full rounded-full transition-colors duration-200" [class]="passwordStrength() >= segment
+                ? (passwordStrength() === 1 ? 'bg-rose-500' : passwordStrength() === 2 ? 'bg-amber-500' : passwordStrength() === 3 ? 'bg-yellow-500' : 'bg-emerald-500')
+                : 'bg-transparent'">
+        </div>
+        }
+      </div>
+      <p class="text-[11px] font-medium leading-4 text-slate-600">
+        Tối thiểu 8 ký tự, gồm chữ hoa, chữ thường, số và ký tự đặc biệt.
+      </p>
+    </div>
+    }
+
+    @if (accountType() === 'VENUE_OWNER' && ownerStep() === 3) {
+    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2" [formGroup]="ownerForm">
+      <label class="block text-sm font-extrabold text-slate-700 sm:col-span-2">
+        Tên doanh nghiệp / cơ sở
+        <input id="register-businessName" formControlName="businessName" type="text"
+          class="mt-2 w-full rounded-2xl border border-slate-300 bg-white px-4 py-3.5 text-[15px] font-bold text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10"
+          placeholder="Tên cơ sở kinh doanh" [attr.aria-invalid]="!!ownerFieldError('businessName')">
+        @if (ownerFieldError('businessName')) { <span class="mt-1.5 block text-xs font-bold text-rose-700">{{
+          ownerFieldError('businessName') }}</span> }
+      </label>
+      <label class="block text-sm font-extrabold text-slate-700">
+        Loại hình kinh doanh
+        <select id="register-businessType" formControlName="businessType"
+          class="mt-2 w-full rounded-2xl border border-slate-300 bg-white px-4 py-3.5 text-[15px] font-bold text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10">
+          <option value="INDIVIDUAL">Cá nhân</option>
+          <option value="COMPANY">Doanh nghiệp</option>
+        </select>
+      </label>
+      <label class="block text-sm font-extrabold text-slate-700">
+        Mã số thuế
+        <input id="register-taxCode" formControlName="taxCode" type="text" inputmode="numeric"
+          class="mt-2 w-full rounded-2xl border border-slate-300 bg-white px-4 py-3.5 text-[15px] font-bold text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10"
+          placeholder="10 hoặc 13 chữ số" [attr.aria-invalid]="!!ownerFieldError('taxCode')">
+        @if (ownerFieldError('taxCode')) { <span class="mt-1.5 block text-xs font-bold text-rose-700">{{
+          ownerFieldError('taxCode') }}</span> }
+      </label>
+    </div>
+    }
+
+    @if (accountType() === 'VENUE_OWNER' && ownerStep() === 4) {
+    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2" [formGroup]="ownerForm">
+      <label class="block text-sm font-extrabold text-slate-700 sm:col-span-2">
+        Địa chỉ chi tiết
+        <input id="register-address" formControlName="address" type="text" autocomplete="street-address"
+          class="mt-2 w-full rounded-2xl border border-slate-300 bg-white px-4 py-3.5 text-[15px] font-bold text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10"
+          placeholder="Số nhà, tên đường" [attr.aria-invalid]="!!ownerFieldError('address')">
+        @if (ownerFieldError('address')) { <span class="mt-1.5 block text-xs font-bold text-rose-700">{{
+          ownerFieldError('address') }}</span> }
+      </label>
+      @for (field of [
+      { key: 'ward', label: 'Phường / xã' },
+      { key: 'district', label: 'Quận / huyện' },
+      { key: 'province', label: 'Tỉnh / thành phố' },
+      { key: 'city', label: 'Thành phố' }
+      ]; track field.key) {
+      <label class="block text-sm font-extrabold text-slate-700">
+        {{ field.label }}
+        <input [id]="'register-' + field.key" [formControlName]="field.key" type="text"
+          class="mt-2 w-full rounded-2xl border border-slate-300 bg-white px-4 py-3.5 text-[15px] font-bold text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10"
+          [attr.aria-invalid]="!!ownerFieldError($any(field.key))">
+        @if (ownerFieldError($any(field.key))) { <span class="mt-1.5 block text-xs font-bold text-rose-700">{{
+          ownerFieldError($any(field.key)) }}</span> }
+      </label>
+      }
+    </div>
+    }
+
+    @if (accountType() === 'VENUE_OWNER' && ownerStep() === 5) {
+    <div class="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+      <p class="text-sm font-black text-slate-900">Tài liệu bắt buộc</p>
+      <p class="mt-1 text-xs font-semibold leading-5 text-slate-600">Ảnh hoặc PDF, tối đa 2MB mỗi tệp. Các tệp được
+        upload bằng presigned URL của workflow.</p>
+      <div class="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
+        @for (document of [
+        { key: 'idCardFront', label: 'CCCD mặt trước' },
+        { key: 'idCardBack', label: 'CCCD mặt sau' },
+        { key: 'businessLicense', label: 'Giấy phép kinh doanh' },
+        { key: 'venueImage', label: 'Hình ảnh cơ sở / sân' }
+        ]; track document.key) {
+        <label
+          class="group rounded-2xl border border-dashed border-slate-300 bg-white p-4 transition hover:border-emerald-500">
+          <span class="block text-sm font-extrabold text-slate-800">{{ document.label }}</span>
+          @if (ownerFile($any(document.key)); as selectedFile) {
+          <span class="mt-2 block truncate text-xs font-bold text-emerald-700">✓ {{ selectedFile.name }}</span>
+          <button type="button" class="mt-2 text-xs font-bold text-rose-700 hover:underline"
+            (click)="removeFile($any(document.key))">Chọn lại</button>
+          } @else {
+          <span class="mt-2 block text-xs font-semibold text-slate-500">Nhấn để chọn tệp</span>
+          }
+          <input class="sr-only" type="file" accept="image/*,.pdf,application/pdf"
+            [attr.aria-invalid]="fileError() ? true : null" (change)="handleFileSelected($any(document.key), $event)">
+        </label>
+        }
+      </div>
+      @if (fileError()) { <p class="mt-3 text-xs font-bold text-rose-700" role="alert">{{ fileError() }}</p> }
+    </div>
+    }
+
+    @if (accountType() === 'PLAYER') {
+    <app-submit-button label="Tạo tài khoản người chơi" loadingLabel="Đang tạo tài khoản…" [loading]="loading()"
+      [disabled]="signUpForm.invalid || registrationSucceeded()" />
+    } @else if (ownerStep() === 1) {
+    <button type="button" data-testid="owner-next-step"
+      class="flex min-h-12 w-full items-center justify-center gap-3 rounded-2xl bg-emerald-600 px-5 py-3.5 text-sm font-black text-white shadow-lg shadow-emerald-600/20 transition-colors hover:bg-emerald-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-600 focus-visible:ring-offset-2"
+      (click)="nextOwnerStep()">
+      <span>Tiếp tục</span>
+      <kbd class="rounded-md bg-white/15 px-2 py-0.5 text-[10px] font-bold">Enter ↵</kbd>
+    </button>
+    } @else {
+    <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
+      <button type="button" data-testid="owner-previous-step"
+        class="min-h-12 rounded-2xl border border-slate-300 bg-white px-5 py-3.5 text-sm font-black text-slate-700 transition-colors hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-600 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60"
+        [disabled]="loading()" (click)="previousOwnerStep()">
+        Quay lại
+      </button>
+      @if (ownerStep() < 5) { <button type="button" data-testid="owner-next-step"
+        class="min-h-12 rounded-2xl bg-emerald-600 px-5 py-3.5 text-sm font-black text-white shadow-lg shadow-emerald-600/20 transition hover:bg-emerald-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-600 focus-visible:ring-offset-2"
+        (click)="nextOwnerStep()">
+        Tiếp tục
+        </button>
+        } @else {
+        <app-submit-button label="Gửi đăng ký chủ sân" loadingLabel="Đang thực thi workflow…" [loading]="loading()"
+          [disabled]="loading() || registrationSucceeded()" />
+        }
+    </div>
+    }
+  </form>
+  }
+
+  <div class="mt-7 border-t border-slate-200 pt-5 text-center font-sports-body">
+    <p class="text-sm font-bold text-slate-600">
+      Đã có tài khoản?
+      <a routerLink="/login" queryParamsHandling="preserve"
+        class="rounded font-extrabold text-emerald-700 transition-colors hover:text-emerald-800 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-600 focus-visible:ring-offset-2">
+        Đăng nhập
+      </a>
+    </p>
+  </div>
 </app-auth-card>
+
+@if (loading()) {
+<app-screen-loader [title]="loadingTitle()" [message]="loadingMessage()" />
+}

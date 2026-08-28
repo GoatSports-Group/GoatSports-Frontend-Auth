@@ -10,6 +10,8 @@ import { LucideIconComponent } from '@shared/components/ui/lucide-icon.component
 })
 export class FormFieldComponent {
   label = input.required<string>();
+  fieldId = input<string>('');
+  errorId = input<string>('');
   icon = input<string>('');
   errorMessage = input<string>('');
   showError = input(false);
