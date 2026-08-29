@@ -3,7 +3,7 @@ import { TestBed } from '@angular/core/testing';
 import { provideRouter, Router } from '@angular/router';
 import { of, Subject, throwError } from 'rxjs';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { provideLucideIcons, LucideLock, LucideMail, LucideUser, LucideUserCheck } from '@lucide/angular';
+import { provideLucideIcons, LucideBuilding2, LucideLock, LucideMail, LucideUser, LucideUserCheck } from '@lucide/angular';
 import { AuthService } from '@presentation/services/auth.service';
 import { CryptoService } from '@presentation/services/crypto.service';
 import { ToastService } from '@shared/services/toast.service';
@@ -24,7 +24,7 @@ describe('SignUpComponent', () => {
       imports: [SignUpComponent],
       providers: [
         provideRouter([]),
-        provideLucideIcons(LucideMail, LucideUser, LucideUserCheck, LucideLock),
+        provideLucideIcons(LucideMail, LucideUser, LucideUserCheck, LucideLock, LucideBuilding2),
         { provide: AuthService, useValue: authService },
         { provide: CryptoService, useValue: cryptoService },
         { provide: ToastService, useValue: toastService }
@@ -55,8 +55,8 @@ describe('SignUpComponent', () => {
     const error = fixture.nativeElement.querySelector('#register-password-validation-errors') as HTMLElement;
     expect(error).not.toBeNull();
     expect(error.classList.contains('text-rose-600')).toBe(true);
-    expect(error.textContent).toContain('Cần 8 ký tự');
-    expect(error.textContent).toContain('Mật khẩu xác nhận không khớp');
+    expect(error.textContent).toContain('8 ký tự');
+    expect(error.textContent).toContain('Không khớp');
 
     const passwordInputs = fixture.nativeElement.querySelectorAll('app-password-input input');
     expect(passwordInputs[0].getAttribute('aria-describedby')).toBe('register-password-validation-errors');
@@ -69,6 +69,15 @@ describe('SignUpComponent', () => {
 
     const card = fixture.nativeElement.querySelector('app-auth-card') as HTMLElement;
     expect(card.classList.contains('auth-card--wide')).toBe(true);
+  });
+
+  it('dùng LucideIcon cho lựa chọn loại tài khoản', () => {
+    const fixture = TestBed.createComponent(SignUpComponent);
+    fixture.detectChanges();
+
+    const icons = fixture.nativeElement.querySelectorAll('[role="tablist"] button lucide-icon');
+    expect(icons).toHaveLength(2);
+    expect(fixture.nativeElement.querySelector('[role="tablist"]')?.textContent).not.toMatch(/[♙▦]/);
   });
 
   it('PLAYER dùng endpoint register và không gửi password thô', () => {

@@ -20,14 +20,16 @@
       [class]="accountType() === 'PLAYER'
         ? 'flex min-h-11 items-center justify-center gap-2 rounded-full bg-white px-3 py-2.5 text-sm font-black text-emerald-700 shadow-sm cursor-pointer'
         : 'flex min-h-11 items-center justify-center gap-2 rounded-full px-3 py-2.5 text-sm font-bold text-slate-600 hover:bg-white/60 cursor-pointer'">
-      <span aria-hidden="true">♙</span> Người chơi
+      <lucide-icon name="user" class="h-4 w-4" aria-hidden="true" />
+      Người chơi
     </button>
     <button type="button" role="tab" [attr.aria-selected]="accountType() === 'VENUE_OWNER'"
       [disabled]="loading() || registrationSucceeded()" (click)="setAccountType('VENUE_OWNER')"
       [class]="accountType() === 'VENUE_OWNER'
         ? 'flex min-h-11 items-center justify-center gap-2 rounded-full bg-emerald-600 px-3 py-2.5 text-sm font-black text-white shadow-md cursor-pointer'
         : 'flex min-h-11 items-center justify-center gap-2 rounded-full px-3 py-2.5 text-sm font-bold text-slate-600 hover:bg-white/60 cursor-pointer'">
-      <span aria-hidden="true">▦</span> Chủ sân
+      <lucide-icon name="building-2" class="h-4 w-4" aria-hidden="true" />
+      Chủ sân
     </button>
   </div>
 
@@ -64,7 +66,7 @@
         <input id="register-username" type="text" formControlName="username" autocomplete="username"
           [attr.aria-invalid]="!!usernameError()" [class.border-rose-400]="!!usernameError()"
           class="w-full rounded-2xl border border-slate-300 bg-white/70 py-3.5 pl-11.5 pr-4 text-[15px] font-bold text-slate-900 outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10"
-          placeholder="Ví dụ: goatsport">
+          placeholder="goatsport">
       </app-form-field>
       <app-form-field fieldId="register-email" errorId="register-email-error" label="Email" icon="mail"
         [showError]="!!emailError()" [errorMessage]="emailError()">

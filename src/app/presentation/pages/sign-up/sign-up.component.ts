@@ -15,6 +15,7 @@ import { PasswordInputComponent } from '@shared/components/password-input/passwo
 import { PasswordStrengthComponent } from '@shared/components/password-strength/password-strength.component';
 import { ScreenLoaderComponent } from '@shared/components/screen-loader/screen-loader.component';
 import { SubmitButtonComponent } from '@shared/components/submit-button/submit-button.component';
+import { LucideIconComponent } from '@shared/components/ui/lucide-icon.component';
 import { registrationForm, RegistrationFormValue } from './sign-up.form';
 
 type RegistrationControlName = keyof RegistrationFormValue;
@@ -32,6 +33,7 @@ type RegistrationControlName = keyof RegistrationFormValue;
     FormFieldComponent,
     PasswordInputComponent,
     PasswordStrengthComponent,
+    LucideIconComponent,
     SubmitButtonComponent,
     ScreenLoaderComponent
   ]
