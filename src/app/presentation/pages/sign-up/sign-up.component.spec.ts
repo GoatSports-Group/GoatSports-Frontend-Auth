@@ -63,6 +63,14 @@ describe('SignUpComponent', () => {
     expect(passwordInputs[1].getAttribute('aria-describedby')).toBe('register-password-validation-errors');
   });
 
+  it('dùng biến thể auth card rộng cho form đăng ký', () => {
+    const fixture = TestBed.createComponent(SignUpComponent);
+    fixture.detectChanges();
+
+    const card = fixture.nativeElement.querySelector('app-auth-card') as HTMLElement;
+    expect(card.classList.contains('auth-card--wide')).toBe(true);
+  });
+
   it('PLAYER dùng endpoint register và không gửi password thô', () => {
     const component = createComponent();
     fillForm(component);

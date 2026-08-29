@@ -68,30 +68,30 @@ export class SignUpComponent {
     'Hệ thống đang tạo tài khoản và gửi mã OTP tới email của bạn. Vui lòng không đóng hoặc tải lại trang.');
 
   readonly usernameError = computed(() => this.getControlError('username', {
-    required: 'Vui lòng nhập tên đăng nhập',
-    trimmedMinLength: 'Tên đăng nhập cần ít nhất 3 ký tự',
-    trimmedMaxLength: 'Tên đăng nhập tối đa 50 ký tự',
-    pattern: 'Tên đăng nhập không được chứa khoảng trắng',
-    duplicate: 'Tên đăng nhập này đã được sử dụng'
+    required: 'Bắt buộc',
+    trimmedMinLength: 'Cần ít nhất 3 ký tự',
+    trimmedMaxLength: 'Tối đa 50 ký tự',
+    pattern: 'Không được chứa khoảng trắng',
+    duplicate: 'Đã được sử dụng'
   }));
   readonly fullNameError = computed(() => this.getControlError('fullName', {
-    required: 'Vui lòng nhập họ và tên',
-    trimmedMinLength: 'Họ và tên cần ít nhất 2 ký tự',
-    trimmedMaxLength: 'Họ và tên tối đa 100 ký tự'
+    required: 'Bắt buộc',
+    trimmedMinLength: 'Cần ít nhất 2 ký tự',
+    trimmedMaxLength: 'Tối đa 100 ký tự'
   }));
   readonly emailError = computed(() => this.getControlError('email', {
-    required: 'Vui lòng nhập email',
-    trimmedMaxLength: 'Email tối đa 254 ký tự',
-    email: 'Email chưa đúng định dạng',
-    duplicate: 'Email này đã được sử dụng'
+    required: 'Bắt buộc',
+    trimmedMaxLength: 'Tối đa 254 ký tự',
+    email: 'Không đúng định dạng',
+    duplicate: 'Đã được sử dụng'
   }));
   readonly passwordError = computed(() => this.getControlError('password', {
-    required: 'Vui lòng nhập mật khẩu',
-    pattern: 'Cần 8 ký tự, chữ hoa, chữ thường, số và ký tự đặc biệt'
+    required: 'Bắt buộc',
+    pattern: 'Ít nhất 8 ký tự, bao gồm chữ hoa, chữ thường, số và ký tự đặc biệt'
   }));
   readonly confirmPasswordError = computed(() => this.getControlError('confirmPassword', {
-    required: 'Vui lòng xác nhận mật khẩu',
-    passwordMismatch: 'Mật khẩu xác nhận không khớp'
+    required: 'Bắt buộc',
+    passwordMismatch: 'Không khớp'
   }));
   readonly passwordValidationErrors = computed(() => [
     this.passwordError(),
