@@ -9,7 +9,6 @@ import { environment } from "@environments/environment";
 import { AuthCardComponent } from '@shared/components/auth-card/auth-card.component';
 import { FormFieldComponent } from '@shared/components/form-field/form-field.component';
 import { SubmitButtonComponent } from '@shared/components/submit-button/submit-button.component';
-import { RegistrationJourneyStepperComponent } from '@shared/components/registration-journey-stepper/registration-journey-stepper.component';
 
 @Component({
   selector: 'app-verify',
@@ -21,8 +20,7 @@ import { RegistrationJourneyStepperComponent } from '@shared/components/registra
     ReactiveFormsModule,
     AuthCardComponent,
     FormFieldComponent,
-    SubmitButtonComponent,
-    RegistrationJourneyStepperComponent
+    SubmitButtonComponent
   ]
 })
 export class VerifyComponent implements OnInit, OnDestroy {
@@ -36,7 +34,6 @@ export class VerifyComponent implements OnInit, OnDestroy {
   loading = signal(false);
   otp = signal<string[]>(['', '', '', '', '', '']);
   countdown = signal(60);
-  isVenueOwner = signal(false);
   private timer: any;
 
   isOtpComplete = computed(() => {
@@ -48,12 +45,10 @@ export class VerifyComponent implements OnInit, OnDestroy {
       email: ['', [Validators.required, Validators.email]]
     });
 
-    this.route.queryParams.subscribe(params => {
-      this.isVenueOwner.set(params['accountType']?.toUpperCase() === 'VENUE_OWNER');
-      if (params['email']) {
-        this.verifyForm.patchValue({ email: params['email'] });
-      }
-    });
+    const email = this.route.snapshot.queryParamMap.get('email');
+    if (email) {
+      this.verifyForm.patchValue({ email });
+    }
 
     this.startCountdown();
   }
@@ -97,7 +92,7 @@ export class VerifyComponent implements OnInit, OnDestroy {
         this.toastService.show('Tài khoản đã được xác thực thành công! Đang chuyển hướng đăng nhập...', 'success');
 
         setTimeout(() => {
-          this.router.navigate(['/login'], { queryParamsHandling: 'preserve' });
+          this.router.navigate(['/login']);
         }, 1500);
       },
       error: (err: HttpErrorResponse) => {
@@ -165,7 +160,7 @@ export class VerifyComponent implements OnInit, OnDestroy {
   }
 
   navigateToSignIn() {
-    this.router.navigate(['/login'], { queryParamsHandling: 'preserve' });
+    this.router.navigate(['/login']);
   }
 
   navigateToHome() {

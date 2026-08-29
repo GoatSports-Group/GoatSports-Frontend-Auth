@@ -168,8 +168,7 @@ export class SignUpComponent {
     this.toast.show(message, 'success');
     timer(700).pipe(take(1), takeUntilDestroyed(this.destroyRef)).subscribe(() => {
       void this.router.navigate(['/verify'], {
-        queryParams: { email, accountType: type },
-        queryParamsHandling: 'merge'
+        queryParams: { email }
       });
     });
   }

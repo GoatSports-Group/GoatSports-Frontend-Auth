@@ -64,7 +64,7 @@ describe('SignUpComponent', () => {
     expect(authService.register).toHaveBeenCalledOnce();
     expect(authService.register.mock.calls[0][0]).toMatchObject({ accountType: 'VENUE_OWNER' });
     expect(navigate).toHaveBeenCalledWith(['/verify'], expect.objectContaining({
-      queryParams: { email: 'owner@goat.vn', accountType: 'VENUE_OWNER' }
+      queryParams: { email: 'owner@goat.vn' }
     }));
     vi.useRealTimers();
   });
