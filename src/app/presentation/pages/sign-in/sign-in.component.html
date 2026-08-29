@@ -3,7 +3,8 @@
   <!-- Header Title -->
   <div class="flex flex-col items-center text-center mb-8">
     <h2 class="text-3xl font-black text-emerald-600 tracking-tight uppercase font-sports-display mb-2">Đăng Nhập</h2>
-    <p class="text-[14px] font-bold text-slate-500 font-sports-body">Kết nối cộng đồng thể thao và đặt sân nhanh chóng</p>
+    <p class="text-[14px] font-bold text-slate-500 font-sports-body">Kết nối cộng đồng thể thao và đặt sân nhanh chóng
+    </p>
   </div>
 
   <!-- Content Section -->
@@ -34,16 +35,15 @@
     <!-- Elegant text divider -->
     <div class="flex items-center text-center my-6">
       <div class="flex-1 border-b border-slate-200/60"></div>
-      <span class="mx-4 text-[11px] font-extrabold uppercase tracking-widest text-slate-500 font-sports-display">hoặc sử dụng email</span>
+      <span class="mx-4 text-[11px] font-extrabold uppercase tracking-widest text-slate-500 font-sports-display">hoặc sử
+        dụng email</span>
       <div class="flex-1 border-b border-slate-200/60"></div>
     </div>
 
     <form [formGroup]="loginForm" (ngSubmit)="login()" class="space-y-5">
 
       <!-- Username Field -->
-      <app-form-field
-        label="Tên đăng nhập / Email"
-        icon="user"
+      <app-form-field label="Tên đăng nhập / Email" icon="user"
         [showError]="!!(loginForm.get('username')?.touched && loginForm.get('username')?.invalid)"
         errorMessage="Bắt buộc">
         <input type="text" formControlName="username" required autocomplete="username"
@@ -53,29 +53,21 @@
       </app-form-field>
 
       <!-- Password Field -->
-      <app-password-input
-        formControlName="password"
-        label="Mật khẩu"
-        placeholder="••••••••"
+      <app-password-input formControlName="password" label="Mật khẩu" placeholder="••••••••"
         autocomplete="current-password"
         [showError]="!!(loginForm.get('password')?.touched && loginForm.get('password')?.invalid)"
-        errorMessage="Mật khẩu chưa đúng"
-        errorClass="border-rose-350"
-      />
+        errorMessage="Mật khẩu không đúng định dạng" errorClass="border-rose-350" />
 
       <!-- Forgot Password — right-aligned -->
       <div class="flex justify-end pt-1">
         <a (click)="navigateToForgotPassword()"
-          class="text-[14px] font-extrabold text-slate-500 hover:text-emerald-600 hover:underline cursor-pointer transition-all duration-200">Quên mật khẩu?</a>
+          class="text-[14px] font-extrabold text-slate-500 hover:text-emerald-600 hover:underline cursor-pointer transition-all duration-200">Quên
+          mật khẩu?</a>
       </div>
 
       <!-- Submit Button -->
-      <app-submit-button
-        label="Đăng Nhập"
-        loadingLabel="Đang đăng nhập..."
-        [loading]="loading()"
-        [disabled]="loginForm.invalid"
-      />
+      <app-submit-button label="Đăng Nhập" loadingLabel="Đang đăng nhập..." [loading]="loading()"
+        [disabled]="loginForm.invalid" />
 
     </form>
   </div>
@@ -84,7 +76,8 @@
   <div class="mt-8 pt-6 border-t border-slate-200 text-center font-sports-body">
     <p class="text-[14px] font-bold text-slate-500">
       Chưa có tài khoản? <a (click)="navigateToSignUp()"
-        class="font-extrabold text-emerald-600 hover:text-emerald-700 hover:underline cursor-pointer transition-colors">Đăng ký ngay</a>
+        class="font-extrabold text-emerald-600 hover:text-emerald-700 hover:underline cursor-pointer transition-colors">Đăng
+        ký ngay</a>
     </p>
   </div>
 
