@@ -85,26 +85,21 @@
       </div>
 
       <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-        <app-password-input formControlName="password" fieldId="register-password" errorId="register-password-error"
+        <app-password-input formControlName="password" fieldId="register-password"
+          errorId="register-password-validation-errors"
           label="Mật khẩu" placeholder="••••••••" autocomplete="new-password"
-          [showError]="!!passwordError()" [errorMessage]="passwordError()" errorClass="border-rose-400" />
+          [showError]="!!passwordError()" errorMessage="" errorClass="border-rose-400" />
         <app-password-input formControlName="confirmPassword" fieldId="register-confirmPassword"
-          errorId="register-confirmPassword-error" label="Xác nhận mật khẩu" placeholder="••••••••"
+          errorId="register-password-validation-errors" label="Xác nhận mật khẩu" placeholder="••••••••"
           autocomplete="new-password" [showError]="!!confirmPasswordError()"
-          [errorMessage]="confirmPasswordError()" errorClass="border-rose-400" />
+          errorMessage="" errorClass="border-rose-400" />
       </div>
 
-      <div class="space-y-2 rounded-2xl bg-slate-50 px-4 py-3" aria-live="polite">
-        <div class="flex justify-between text-[11px] font-extrabold uppercase tracking-wider text-slate-600">
-          <span>Độ mạnh mật khẩu</span><span>{{ passwordStrength() }}/4</span>
-        </div>
-        <div class="grid h-1.5 grid-cols-4 gap-1.5 rounded-full bg-slate-200" aria-hidden="true">
-          @for (segment of [1, 2, 3, 4]; track segment) {
-            <span class="rounded-full" [class.bg-emerald-500]="passwordStrength() >= segment"></span>
-          }
-        </div>
-        <p class="text-[11px] text-slate-600">Tối thiểu 8 ký tự, gồm chữ hoa, chữ thường, số và ký tự đặc biệt.</p>
-      </div>
+      <app-password-strength
+        [password]="signUpForm.controls.password.value"
+        [errors]="passwordValidationErrors()"
+        errorId="register-password-validation-errors"
+      />
 
       <app-submit-button
         [label]="accountType() === 'VENUE_OWNER' ? 'Tạo tài khoản chủ sân' : 'Tạo tài khoản người chơi'"

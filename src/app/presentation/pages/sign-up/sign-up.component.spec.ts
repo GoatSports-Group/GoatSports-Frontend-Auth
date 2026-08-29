@@ -42,6 +42,27 @@ describe('SignUpComponent', () => {
     expect(authService.register).not.toHaveBeenCalled();
   });
 
+  it('hiển thị lỗi password và confirm password dưới thanh độ mạnh', () => {
+    const fixture = TestBed.createComponent(SignUpComponent);
+    fixture.detectChanges();
+    const component = fixture.componentInstance;
+
+    component.signUpForm.patchValue({ password: 'weak', confirmPassword: 'different' });
+    component.signUpForm.controls.password.markAsTouched();
+    component.signUpForm.controls.confirmPassword.markAsTouched();
+    fixture.detectChanges();
+
+    const error = fixture.nativeElement.querySelector('#register-password-validation-errors') as HTMLElement;
+    expect(error).not.toBeNull();
+    expect(error.classList.contains('text-rose-600')).toBe(true);
+    expect(error.textContent).toContain('Cần 8 ký tự');
+    expect(error.textContent).toContain('Mật khẩu xác nhận không khớp');
+
+    const passwordInputs = fixture.nativeElement.querySelectorAll('app-password-input input');
+    expect(passwordInputs[0].getAttribute('aria-describedby')).toBe('register-password-validation-errors');
+    expect(passwordInputs[1].getAttribute('aria-describedby')).toBe('register-password-validation-errors');
+  });
+
   it('PLAYER dùng endpoint register và không gửi password thô', () => {
     const component = createComponent();
     fillForm(component);

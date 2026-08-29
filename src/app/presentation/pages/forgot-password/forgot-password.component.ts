@@ -9,6 +9,7 @@ import { CryptoService } from '@presentation/services/crypto.service';
 import { AuthCardComponent } from '@shared/components/auth-card/auth-card.component';
 import { FormFieldComponent } from '@shared/components/form-field/form-field.component';
 import { PasswordInputComponent } from '@shared/components/password-input/password-input.component';
+import { PasswordStrengthComponent } from '@shared/components/password-strength/password-strength.component';
 import { SubmitButtonComponent } from '@shared/components/submit-button/submit-button.component';
 import { PASSWORD_PATTERN } from '@shared/constants/auth.constants';
 import { passwordMatchValidator } from '@shared/validators/password.validators';
@@ -24,6 +25,7 @@ import { passwordMatchValidator } from '@shared/validators/password.validators';
     AuthCardComponent,
     FormFieldComponent,
     PasswordInputComponent,
+    PasswordStrengthComponent,
     SubmitButtonComponent
   ]
 })
@@ -37,6 +39,7 @@ export class ForgotPasswordComponent {
 
   forgotForm: FormGroup;
   loading = signal(false);
+  private submitted = signal(false);
 
   constructor() {
     this.forgotForm = this.fb.group({
@@ -49,6 +52,8 @@ export class ForgotPasswordComponent {
   }
 
   onSubmitStep1() {
+    this.submitted.set(true);
+    this.forgotForm.markAllAsTouched();
     if (this.forgotForm.invalid) return;
 
     this.loading.set(true);
@@ -93,5 +98,35 @@ export class ForgotPasswordComponent {
 
   navigateToSignIn() {
     this.router.navigate(['/login'], { queryParamsHandling: 'preserve' });
+  }
+
+  passwordHasError(): boolean {
+    const control = this.forgotForm.get('password');
+    return !!(control?.invalid && (control.touched || this.submitted()));
+  }
+
+  confirmPasswordHasError(): boolean {
+    const control = this.forgotForm.get('confirmPassword');
+    return !!(control?.invalid && (control.touched || this.submitted()));
+  }
+
+  passwordValidationErrors(): string[] {
+    const errors: string[] = [];
+    const password = this.forgotForm.get('password');
+    const confirmPassword = this.forgotForm.get('confirmPassword');
+
+    if (this.passwordHasError()) {
+      errors.push(password?.hasError('required')
+        ? 'Vui lòng nhập mật khẩu mới.'
+        : 'Mật khẩu cần ít nhất 8 ký tự, gồm chữ hoa, chữ thường, số và ký tự đặc biệt.');
+    }
+
+    if (this.confirmPasswordHasError()) {
+      errors.push(confirmPassword?.hasError('required')
+        ? 'Vui lòng xác nhận mật khẩu mới.'
+        : 'Mật khẩu xác nhận không khớp.');
+    }
+
+    return errors;
   }
 }

@@ -12,6 +12,7 @@ import { ToastService } from '@shared/services/toast.service';
 import { AuthCardComponent } from '@shared/components/auth-card/auth-card.component';
 import { FormFieldComponent } from '@shared/components/form-field/form-field.component';
 import { PasswordInputComponent } from '@shared/components/password-input/password-input.component';
+import { PasswordStrengthComponent } from '@shared/components/password-strength/password-strength.component';
 import { ScreenLoaderComponent } from '@shared/components/screen-loader/screen-loader.component';
 import { SubmitButtonComponent } from '@shared/components/submit-button/submit-button.component';
 import { registrationForm, RegistrationFormValue } from './sign-up.form';
@@ -30,6 +31,7 @@ type RegistrationControlName = keyof RegistrationFormValue;
     AuthCardComponent,
     FormFieldComponent,
     PasswordInputComponent,
+    PasswordStrengthComponent,
     SubmitButtonComponent,
     ScreenLoaderComponent
   ]
@@ -49,7 +51,6 @@ export class SignUpComponent {
   readonly registrationSucceeded = signal(false);
   readonly successMessage = signal('');
   readonly apiError = signal<string | null>(null);
-  readonly passwordStrength = signal(0);
   private readonly submitted = signal(false);
   private readonly duplicateUsername = signal(false);
   private readonly duplicateEmail = signal(false);
@@ -92,12 +93,13 @@ export class SignUpComponent {
     required: 'Vui lòng xác nhận mật khẩu',
     passwordMismatch: 'Mật khẩu xác nhận không khớp'
   }));
+  readonly passwordValidationErrors = computed(() => [
+    this.passwordError(),
+    this.confirmPasswordError()
+  ].filter(message => !!message));
 
   constructor() {
-    this.signUpForm.controls.password.valueChanges
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(value => this.passwordStrength.set(this.checkPasswordStrength(value)));
-    this.signUpForm.statusChanges
+    this.signUpForm.events
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(() => this.validationVersion.update(value => value + 1));
     this.clearDuplicateOnChange('username');
@@ -239,12 +241,6 @@ export class SignUpComponent {
 
   private isDuplicate(message: string): boolean {
     return ['đã tồn tại', 'đã được sử dụng', 'already exists', 'duplicate'].some(value => message.includes(value));
-  }
-
-  private checkPasswordStrength(password: string): number {
-    if (!password) return 0;
-    return [password.length >= 8, /[a-z]/.test(password), /[A-Z]/.test(password), /\d/.test(password), /[^A-Za-z0-9]/.test(password)]
-      .filter(Boolean).length >= 5 ? 4 : Math.min(3, Math.max(1, Math.floor(password.length / 3)));
   }
 
   private readInitialAccountType(): RegistrationAccountType {
