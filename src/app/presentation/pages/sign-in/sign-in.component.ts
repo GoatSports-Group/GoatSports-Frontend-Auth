@@ -12,6 +12,7 @@ import { FormFieldComponent } from '@shared/components/form-field/form-field.com
 import { PasswordInputComponent } from '@shared/components/password-input/password-input.component';
 import { SubmitButtonComponent } from '@shared/components/submit-button/submit-button.component';
 import { PASSWORD_PATTERN } from '@shared/constants/auth.constants';
+import { resolvePostLoginDestination } from '@presentation/routing/post-login-destination';
 
 @Component({
   selector: 'app-sign-in',
@@ -125,13 +126,13 @@ export class SignInComponent implements OnInit {
   }
 
   private resolvePostLoginDestination(user: { role?: { name?: string } } | null | undefined): string {
-    const roleName = (user?.role?.name || '').toUpperCase();
-    const redirectUrl = this.route.snapshot.queryParams['redirect'];
-
-    if (roleName === 'ADMIN' || roleName === 'VENUE_OWNER') {
-      return redirectUrl || `${environment.adminApiUrl}/admin/dashboard`;
-    }
-
-    return redirectUrl || environment.clientApiUrl;
+    return resolvePostLoginDestination(
+      user?.role?.name,
+      this.route.snapshot.queryParams['redirect'],
+      {
+        adminUrl: environment.adminApiUrl,
+        clientUrl: environment.clientApiUrl
+      }
+    );
   }
 }
