@@ -12,3 +12,10 @@
   background-repeat: no-repeat;
   background-size: cover;
 }
+
+// Dark theme: the illustration is light, so tint it toward the canvas; keeps the sports mood, fixes contrast.
+:host-context([data-theme='dark']) .auth-shell {
+  background-image:
+    linear-gradient(rgb(11 19 16 / 84%), rgb(11 19 16 / 84%)),
+    url('/assets/images/background.png');
+}

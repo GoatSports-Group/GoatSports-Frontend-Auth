@@ -18,13 +18,13 @@
   height: 2px;
   overflow: hidden;
   border-radius: 999px;
-  background: #dbe4e1;
+  background: var(--surface-strong);
 }
 
 .journey-stepper__progress {
   display: block;
   height: 100%;
-  background: #059669;
+  background: var(--primary-fill);
   transition: width 200ms ease;
 }
 
@@ -37,7 +37,7 @@
   padding: 0 3px;
   border: 0;
   background: transparent;
-  color: #94a3b8;
+  color: var(--muted);
   font-family: 'Be Vietnam Pro', sans-serif;
   font-size: 11px;
   font-weight: 650;
@@ -51,7 +51,7 @@
 
 .journey-stepper__step:focus-visible {
   border-radius: 10px;
-  outline: 2px solid #059669;
+  outline: 2px solid var(--primary);
   outline-offset: 3px;
 }
 
@@ -61,28 +61,28 @@
   width: 40px;
   height: 40px;
   place-items: center;
-  border: 2px solid #dbe4e1;
+  border: 2px solid var(--hairline);
   border-radius: 50%;
-  background: #fff;
-  color: #94a3b8;
+  background: var(--surface);
+  color: var(--muted);
   font-size: 13px;
   font-weight: 800;
 }
 
 .journey-stepper__step.is-active,
 .journey-stepper__step.is-complete {
-  color: #047857;
+  color: var(--primary-hover);
 }
 
 .journey-stepper__step.is-active .journey-stepper__number {
-  border-color: #059669;
-  color: #047857;
+  border-color: var(--primary);
+  color: var(--primary-hover);
   box-shadow: 0 0 0 4px rgb(5 150 105 / 11%);
 }
 
 .journey-stepper__step.is-complete .journey-stepper__number {
-  border-color: #059669;
-  background: #059669;
+  border-color: var(--primary);
+  background: var(--primary-fill);
   color: #fff;
 }
 

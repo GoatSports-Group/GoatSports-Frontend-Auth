@@ -1,4 +1,5 @@
 import { NgModule } from '@angular/core';
+import { ThemeToggleComponent } from './presentation/shared/components/theme-toggle/theme-toggle.component';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { HttpClientModule } from '@angular/common/http';
@@ -25,6 +26,7 @@ import {
   ],
   imports: [
     BrowserModule,
+    ThemeToggleComponent,
     HttpClientModule,
     RouterModule,
     AppRoutingModule,

@@ -1,29 +1,30 @@
 /* Angular Material Prebuilt Theme And Tailwindcss */
 @use '@angular/material/prebuilt-themes/cyan-orange.css';
 @use 'material-icons/iconfont/material-icons.scss';
+@use './styles/goat-theme';
 @use "tailwindcss";
 
 @theme {
-  --color-primary: #059669;
-  --color-primary-hover: #047857;
-  --color-primary-light: #f0fdf4;
+  --color-primary: var(--primary);
+  --color-primary-hover: var(--primary-hover);
+  --color-primary-light: var(--primary-light);
 
   --color-accent: #0ea5e9;
   --color-accent-hover: #0284c7;
   --color-accent-light: #f0f9ff;
 
-  --color-success: #10b981;
-  --color-warning: #f59e0b;
-  --color-danger: #ef4444;
-  --color-info: #06b6d4;
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-danger: var(--danger);
+  --color-info: var(--info);
 
-  --color-text-dark: #0f172a;
-  --color-text-muted: #64748b;
+  --color-text-dark: var(--ink);
+  --color-text-muted: var(--body);
   --color-text-light: #ffffff;
 
-  --color-bg-body: #f8fafc;
-  --color-bg-card: #ffffff;
-  --color-border-color: #cbd5e1;
+  --color-bg-body: var(--canvas);
+  --color-bg-card: var(--surface);
+  --color-border-color: var(--border-strong);
 }
 
 /* Import Fonts */
@@ -155,44 +156,13 @@
 
 /* Global Design System & Variables */
 :root {
-  --primary: #059669;
-  /* Sporty grass green (Thảm cỏ tốc độ) */
-  --primary-hover: #047857;
-  --primary-light: #f0fdf4;
-  /* Siêu sáng mint background (Đã tối ưu AA contrast) */
-
-  --accent: #0ea5e9;
-  /* Cyber energetic blue (Màu xanh công nghệ cao cấp) */
-  --accent-hover: #0284c7;
-  --accent-light: #f0f9ff;
-
-  --success: #10b981;
-  --warning: #f59e0b;
-  --danger: #ef4444;
-  --info: #06b6d4;
-
-  --text-dark: #0f172a;
-  /* Slate-900 (Màu tối hiện đại, thay cho xám chết) */
-  --text-muted: #64748b;
-  /* Slate-500 secondary labels */
   --text-light: #ffffff;
-
-  --bg-body: #f8fafc;
-  /* Slate-50 ultra-clean premium canvas */
-  --bg-card: #ffffff;
-  --border-color: #cbd5e1;
-  /* Slate-300 sharp, thin boundary line */
-
   --font-heading: 'Be Vietnam Pro', sans-serif;
   --font-body: 'Be Vietnam Pro', sans-serif;
 
   --border-radius-sm: 6px;
   --border-radius: 14px;
   --border-radius-lg: 24px;
-
-  --shadow-sm: 0 1px 2px 0 rgba(15, 23, 42, 0.05);
-  --shadow-md: 0 12px 30px -10px rgba(15, 23, 42, 0.08);
-  --shadow-lg: 0 30px 60px -15px rgba(15, 23, 42, 0.12);
   --shadow-glow: 0 0 20px 0 rgba(5, 150, 105, 0.25);
 
   --transition-smooth: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
@@ -319,8 +289,8 @@
   // CSS variables override for MDC form fields text colors and contrast
   --mat-form-field-outlined-input-text-color: var(--text-dark);
   --mat-form-field-filled-input-text-color: var(--text-dark);
-  --mat-form-field-outlined-label-text-color: #4a5568;
-  --mat-form-field-filled-label-text-color: #4a5568;
+  --mat-form-field-outlined-label-text-color: var(--ink-2);
+  --mat-form-field-filled-label-text-color: var(--ink-2);
   --mat-form-field-outlined-input-text-placeholder-color: var(--text-muted);
   --mat-form-field-filled-input-text-placeholder-color: var(--text-muted);
 
@@ -335,7 +305,7 @@
 
   .mdc-text-field {
     border-radius: var(--border-radius-sm) !important;
-    background-color: #ffffff !important;
+    background-color: var(--surface) !important;
   }
 
   .mat-mdc-form-field-infix {
@@ -396,7 +366,7 @@ mat-icon[color="primary"] {
 
 /* Badge styles */
 .mat-badge-accent .mat-badge-content {
-  background-color: var(--accent) !important;
+  background-color: var(--primary-fill) !important;
   color: #ffffff !important;
 }
 
@@ -439,7 +409,7 @@ mat-icon[color="primary"] {
   overflow-x: auto;
   border: 1px solid var(--border-color);
   border-radius: var(--border-radius);
-  background-color: #ffffff;
+  background-color: var(--surface);
   box-shadow: var(--shadow-sm);
 
   table {
@@ -447,7 +417,7 @@ mat-icon[color="primary"] {
     border-collapse: collapse;
 
     th.mat-mdc-header-cell {
-      background-color: #f7fafc;
+      background-color: var(--info-soft);
       color: var(--text-dark);
       font-weight: 700;
       font-family: var(--font-heading);
@@ -577,4 +547,12 @@ mat-error,
     animation: pulseGlow 1.5s infinite;
     transform: translateY(-1px);
   }
+}
+
+/* Theme switch floats top-right on every auth screen (the pages have no shared header). */
+.auth-theme-toggle {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  z-index: 50;
 }
