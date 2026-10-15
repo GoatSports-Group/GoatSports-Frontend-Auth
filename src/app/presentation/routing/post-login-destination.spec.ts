@@ -7,7 +7,7 @@ const destinations = {
 };
 
 describe('resolvePostLoginDestination', () => {
-  it.each(['ADMIN', 'VENUE_OWNER', 'venue_owner'])(
+  it.each(['ADMIN', 'VENUE_OWNER', 'venue_owner', 'SUPPORT_STAFF'])(
     'always sends %s to the dashboard and ignores a client redirect',
     role => {
       expect(resolvePostLoginDestination(role, 'http://localhost:4200/venues', destinations))

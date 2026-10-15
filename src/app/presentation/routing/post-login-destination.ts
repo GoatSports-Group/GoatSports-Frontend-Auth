@@ -1,4 +1,5 @@
-const DASHBOARD_ROLES = new Set(['ADMIN', 'VENUE_OWNER']);
+/** Mọi vai trò không phải người chơi làm việc ở trang quản trị: ADMIN, chủ sân và vai trò admin tự tạo. */
+const CLIENT_ROLE = 'PLAYER';
 
 export interface PostLoginDestinations {
   adminUrl: string;
@@ -10,7 +11,8 @@ export function resolvePostLoginDestination(
   requestedRedirect: string | null | undefined,
   destinations: PostLoginDestinations
 ): string {
-  if (DASHBOARD_ROLES.has((roleName || '').toUpperCase())) {
+  const role = (roleName || '').toUpperCase();
+  if (role && role !== CLIENT_ROLE) {
     return `${destinations.adminUrl.replace(/\/+$/, '')}/admin/dashboard`;
   }
 
