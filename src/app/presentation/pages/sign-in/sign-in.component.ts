@@ -1,6 +1,6 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule, Router, ActivatedRoute } from '@angular/router';
+import { RouterModule, Router, ActivatedRoute, ParamMap } from '@angular/router';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { HttpErrorResponse } from '@angular/common/http';
 import { ToastService } from '@shared/services/toast.service';
@@ -13,6 +13,8 @@ import { PasswordInputComponent } from '@shared/components/password-input/passwo
 import { SubmitButtonComponent } from '@shared/components/submit-button/submit-button.component';
 import { PASSWORD_PATTERN } from '@shared/constants/auth.constants';
 import { resolvePostLoginDestination } from '@presentation/routing/post-login-destination';
+import { AccountStatusError } from '@application/dto/auth/auth.dto';
+import { AccountStatusDialogComponent } from './account-status-dialog.component';
 
 @Component({
   selector: 'app-sign-in',
@@ -25,7 +27,8 @@ import { resolvePostLoginDestination } from '@presentation/routing/post-login-de
     AuthCardComponent,
     FormFieldComponent,
     PasswordInputComponent,
-    SubmitButtonComponent
+    SubmitButtonComponent,
+    AccountStatusDialogComponent
   ]
 })
 export class SignInComponent implements OnInit {
@@ -38,12 +41,25 @@ export class SignInComponent implements OnInit {
 
   loginForm!: FormGroup;
   loading = signal(false);
+  /** Mật khẩu đúng nhưng tài khoản chưa kích hoạt / bị khóa: mở popup tương ứng. */
+  accountStatus = signal<AccountStatusError | null>(null);
 
   ngOnInit() {
     this.loginForm = this.fb.group({
       username: ['', [Validators.required]],
       password: ['', [Validators.required, Validators.pattern(PASSWORD_PATTERN)]]
     });
+
+    // Tài khoản bị khóa đăng nhập bằng Google: auth-service chuyển về đây kèm mã khiếu nại. Mở popup rồi xóa
+    // tham số khỏi thanh địa chỉ (mã dùng một lần, không để lại trong lịch sử).
+    const blocked = blockedStatusFromQuery(this.route.snapshot.queryParamMap);
+    if (blocked) {
+      this.accountStatus.set(blocked);
+      void this.router.navigate([], {
+        relativeTo: this.route, replaceUrl: true,
+        queryParams: { account: null, appealToken: null, email: null, fullName: null }, queryParamsHandling: 'merge'
+      });
+    }
 
     this.authService.sessionReady$.subscribe(ready => {
       if (ready && this.authService.isAuthenticated) {
@@ -81,6 +97,11 @@ export class SignInComponent implements OnInit {
           },
           error: (err: HttpErrorResponse) => {
             this.loading.set(false);
+            const status = accountStatusFrom(err);
+            if (status) {
+              this.accountStatus.set(status);
+              return;
+            }
             const errorMsg = err.error?.message || 'Đăng nhập thất bại. Vui lòng kiểm tra lại tài khoản!';
             this.toastService.show(errorMsg, 'error');
           }
@@ -91,6 +112,12 @@ export class SignInComponent implements OnInit {
         this.toastService.show('Không thể kết nối bảo mật để mã hóa mật khẩu!', 'error');
       }
     });
+  }
+
+  /** Sang trang nhập OTP với email tài khoản; giữ ?redirect để đăng nhập xong quay về đúng nơi. */
+  goToVerify(email: string) {
+    this.accountStatus.set(null);
+    this.router.navigate(['/verify'], { queryParams: { email }, queryParamsHandling: 'merge' });
   }
 
   navigateToHome() {
@@ -135,4 +162,26 @@ export class SignInComponent implements OnInit {
       }
     );
   }
+}
+
+/** 403 + error ACCOUNT_INACTIVE / ACCOUNT_BLOCKED từ auth-service (chỉ có khi mật khẩu đúng). */
+export function accountStatusFrom(err: HttpErrorResponse): AccountStatusError | null {
+  const code = err?.status === 403 ? err.error?.error : null;
+  const data = err?.error?.data ?? {};
+  if (code === 'ACCOUNT_INACTIVE' && data.email) {
+    return { code, email: data.email, codeSent: data.codeSent !== false };
+  }
+  if (code === 'ACCOUNT_BLOCKED' && data.email && data.appealToken) {
+    return { code, email: data.email, fullName: data.fullName, appealToken: data.appealToken,
+      appealTtlMinutes: Number(data.appealTtlMinutes) || 30 };
+  }
+  return null;
+}
+
+/** /login?account=blocked&appealToken=…&email=…&fullName=… do auth-service gửi về sau khi Google xác thực. */
+export function blockedStatusFromQuery(params: ParamMap): AccountStatusError | null {
+  const appealToken = params.get('appealToken');
+  const email = params.get('email');
+  if (params.get('account') !== 'blocked' || !appealToken || !email) return null;
+  return { code: 'ACCOUNT_BLOCKED', email, fullName: params.get('fullName') ?? undefined, appealToken, appealTtlMinutes: 30 };
 }

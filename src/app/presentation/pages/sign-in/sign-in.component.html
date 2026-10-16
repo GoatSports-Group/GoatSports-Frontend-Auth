@@ -82,3 +82,7 @@
   </div>
 
 </app-auth-card>
+
+@if (accountStatus(); as status) {
+  <app-account-status-dialog [status]="status" (closed)="accountStatus.set(null)" (verify)="goToVerify($event)" />
+}

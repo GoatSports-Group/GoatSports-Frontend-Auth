@@ -1,7 +1,7 @@
 import { InjectionToken } from '@angular/core';
 import { Observable } from 'rxjs';
 import { User } from '@domain/entities/user';
-import { LoginRequest, RegisterRequest, VerificationRequest, ForgotPasswordRequest } from '@application/dto/auth/auth.dto';
+import { AccountAppealRequest, LoginRequest, RegisterRequest, VerificationRequest, ForgotPasswordRequest } from '@application/dto/auth/auth.dto';
 
 export interface AuthRepository {
   login(payload: LoginRequest): Observable<User>;
@@ -12,6 +12,7 @@ export interface AuthRepository {
   refresh(): Observable<User>;
   getCurrentUser(): Observable<User>;
   getPublicKey(): Observable<string>;
+  submitAccountAppeal(payload: AccountAppealRequest): Observable<void>;
 }
 
 export const AUTH_REPOSITORY_TOKEN = new InjectionToken<AuthRepository>('AUTH_REPOSITORY_TOKEN');

@@ -17,7 +17,12 @@ import {
   LucideUser,
   LucideUserCheck,
   LucideLock,
-  LucideBuilding2
+  LucideBuilding2,
+  LucideMailCheck,
+  LucideShieldAlert,
+  LucideSend,
+  LucideX,
+  LucideCircleCheck
 } from '@lucide/angular';
 
 @NgModule({
@@ -47,7 +52,12 @@ import {
       LucideUser,
       LucideUserCheck,
       LucideLock,
-      LucideBuilding2
+      LucideBuilding2,
+      LucideMailCheck,
+      LucideShieldAlert,
+      LucideSend,
+      LucideX,
+      LucideCircleCheck
     )
   ],
   bootstrap: [AppComponent]

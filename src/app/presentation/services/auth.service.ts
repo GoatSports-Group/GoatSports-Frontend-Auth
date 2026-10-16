@@ -3,6 +3,7 @@ import { Observable, tap } from 'rxjs';
 import { Router } from '@angular/router';
 import { SessionStateService } from '@presentation/services/session-state.service';
 import {
+  AccountAppealRequest,
   ForgotPasswordRequest,
   LoginRequest,
   RegisterRequest,
@@ -14,6 +15,7 @@ import { RegisterUseCase } from '@application/usecase/auth/register.usecase';
 import { VerifyUseCase } from '@application/usecase/auth/verify.usecase';
 import { ForgotPasswordUseCase } from '@application/usecase/auth/forgot-password.usecase';
 import { ResendVerificationUseCase } from '@application/usecase/auth/resend-verification.usecase';
+import { SubmitAccountAppealUseCase } from '@application/usecase/auth/submit-account-appeal.usecase';
 import { RefreshTokenUseCase } from '@application/usecase/auth/refresh-token.usecase';
 import { GetCurrentUserUseCase } from '@application/usecase/auth/get-current-user.usecase';
 
@@ -29,6 +31,7 @@ export class AuthService {
   private verifyUseCase = inject(VerifyUseCase);
   private forgotPasswordUseCase = inject(ForgotPasswordUseCase);
   private resendVerificationUseCase = inject(ResendVerificationUseCase);
+  private submitAccountAppealUseCase = inject(SubmitAccountAppealUseCase);
   private refreshTokenUseCase = inject(RefreshTokenUseCase);
   private getCurrentUserUseCase = inject(GetCurrentUserUseCase);
 
@@ -64,6 +67,10 @@ export class AuthService {
 
   resendVerificationCode(email: string): Observable<void> {
     return this.resendVerificationUseCase.execute(email);
+  }
+
+  submitAccountAppeal(payload: AccountAppealRequest): Observable<void> {
+    return this.submitAccountAppealUseCase.execute(payload);
   }
 
   refresh(): Observable<User> {

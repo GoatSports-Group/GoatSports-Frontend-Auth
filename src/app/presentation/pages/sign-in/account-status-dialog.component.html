@@ -1,0 +1,117 @@
+<div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm font-sports-body"
+  (click)="close()">
+  <section role="dialog" aria-modal="true" aria-labelledby="account-status-title"
+    class="w-full max-w-lg max-h-[92vh] overflow-y-auto rounded-3xl border border-slate-200 bg-white shadow-2xl"
+    (click)="$event.stopPropagation()">
+
+    <header class="flex items-start gap-4 p-6 pb-4">
+      @if (status.code === 'ACCOUNT_INACTIVE') {
+        <span class="flex h-12 w-12 flex-none items-center justify-center rounded-2xl bg-emerald-50 text-emerald-600">
+          <lucide-icon name="mail-check" class="h-6 w-6" />
+        </span>
+      } @else {
+        <span class="flex h-12 w-12 flex-none items-center justify-center rounded-2xl bg-rose-50 text-rose-600">
+          <lucide-icon name="shield-alert" class="h-6 w-6" />
+        </span>
+      }
+      <div class="min-w-0 flex-1">
+        <h2 id="account-status-title" class="text-xl font-black text-slate-900">
+          {{ status.code === 'ACCOUNT_INACTIVE' ? 'Tài khoản chưa được kích hoạt' : (sent() ? 'Đã gửi thư tới quản trị viên' : 'Tài khoản đã bị khóa') }}
+        </h2>
+        <p class="mt-1 break-all text-sm font-bold text-slate-500">{{ status.email }}</p>
+      </div>
+      <button type="button" (click)="close()" aria-label="Đóng"
+        class="flex h-9 w-9 flex-none items-center justify-center rounded-xl text-slate-500 hover:bg-slate-100 hover:text-slate-800 cursor-pointer">
+        <lucide-icon name="x" class="h-5 w-5" />
+      </button>
+    </header>
+
+    @if (status.code === 'ACCOUNT_INACTIVE') {
+      <div class="px-6 pb-6">
+        @if (status.codeSent) {
+          <p class="text-[15px] font-semibold leading-relaxed text-slate-600">
+            Mình đã gửi mã OTP 6 số tới email trên. Bấm <strong class="text-slate-900">Xác thực</strong> và nhập mã để kích
+            hoạt tài khoản, sau đó đăng nhập lại.
+          </p>
+        } @else {
+          <p class="text-[15px] font-semibold leading-relaxed text-slate-600">
+            Mã OTP vừa được gửi tới email trên ít phút trước. Hãy kiểm tra hộp thư (cả mục Spam), hoặc bấm
+            <strong class="text-slate-900">Xác thực</strong> rồi chọn gửi lại mã khi hết thời gian chờ.
+          </p>
+        }
+        <div class="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+          <button type="button" (click)="close()"
+            class="rounded-2xl border border-slate-300 px-5 py-3 text-[15px] font-extrabold text-slate-700 hover:bg-slate-50 cursor-pointer">
+            Để sau
+          </button>
+          <button #firstField type="button" (click)="goVerify()"
+            class="rounded-2xl bg-emerald-600 px-6 py-3 text-[15px] font-extrabold text-white hover:bg-emerald-700 focus:outline-none focus:ring-4 focus:ring-emerald-500/30 cursor-pointer">
+            Xác thực
+          </button>
+        </div>
+      </div>
+    } @else if (sent()) {
+      <div class="px-6 pb-6">
+        <div class="flex items-start gap-3 rounded-2xl bg-emerald-50 p-4 text-emerald-800">
+          <lucide-icon name="circle-check" class="mt-0.5 h-5 w-5 flex-none" />
+          <p class="text-[15px] font-semibold leading-relaxed">
+            Quản trị viên đã nhận được thư của bạn. Phản hồi sẽ được gửi về email <strong>{{ status.email }}</strong>.
+          </p>
+        </div>
+        <div class="mt-6 flex justify-end">
+          <button #firstField type="button" (click)="close()"
+            class="rounded-2xl bg-emerald-600 px-6 py-3 text-[15px] font-extrabold text-white hover:bg-emerald-700 cursor-pointer">
+            Đóng
+          </button>
+        </div>
+      </div>
+    } @else {
+      <form class="px-6 pb-6" (ngSubmit)="sendAppeal()">
+        <p class="text-[15px] font-semibold leading-relaxed text-slate-600">
+          Tài khoản của bạn đang bị khóa nên chưa đăng nhập được. Nếu bạn cho rằng đây là nhầm lẫn, hãy gửi thư cho quản trị
+          viên. Phản hồi sẽ được gửi về email tài khoản.
+        </p>
+
+        <!-- Khung soạn thư: như một email -->
+        <div class="mt-5 overflow-hidden rounded-2xl border border-slate-300">
+          <div class="flex items-center gap-3 border-b border-slate-200 px-4 py-2.5 text-sm">
+            <span class="w-14 flex-none font-bold text-slate-500">Từ</span>
+            <span class="min-w-0 truncate font-bold text-slate-900">{{ status.fullName || status.email }} &lt;{{ status.email }}&gt;</span>
+          </div>
+          <div class="flex items-center gap-3 border-b border-slate-200 px-4 py-2.5 text-sm">
+            <span class="w-14 flex-none font-bold text-slate-500">Đến</span>
+            <span class="font-bold text-slate-900">Ban quản trị GOAT Sports</span>
+          </div>
+          <label class="flex items-center gap-3 border-b border-slate-200 px-4 py-1.5 text-sm">
+            <span class="w-14 flex-none font-bold text-slate-500">Tiêu đề</span>
+            <input #firstField name="subject" [(ngModel)]="subject" [maxlength]="subjectMax" required
+              class="min-w-0 flex-1 bg-transparent py-1.5 font-bold text-slate-900 focus:outline-none" />
+          </label>
+          <textarea name="message" [(ngModel)]="message" rows="7" [maxlength]="messageMax" required
+            aria-label="Nội dung thư" placeholder="Trình bày ngắn gọn: bạn đã làm gì trước khi bị khóa, vì sao bạn nghĩ đây là nhầm lẫn…"
+            class="block w-full resize-y px-4 py-3 text-[15px] leading-relaxed text-slate-900 placeholder-slate-400 focus:outline-none"></textarea>
+        </div>
+        <div class="mt-2 flex justify-between gap-3 text-xs font-bold text-slate-500">
+          <span>Ít nhất {{ messageMin }} ký tự. Phiên gửi thư có hiệu lực {{ status.appealTtlMinutes }} phút.</span>
+          <span [class.text-rose-600]="messageLength > messageMax">{{ messageLength }}/{{ messageMax }}</span>
+        </div>
+
+        @if (error()) {
+          <p role="alert" class="mt-3 rounded-xl bg-rose-50 px-4 py-3 text-sm font-bold text-rose-700">{{ error() }}</p>
+        }
+
+        <div class="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+          <button type="button" (click)="close()" [disabled]="sending()"
+            class="rounded-2xl border border-slate-300 px-5 py-3 text-[15px] font-extrabold text-slate-700 hover:bg-slate-50 disabled:opacity-60 cursor-pointer">
+            Đóng
+          </button>
+          <button type="submit" [disabled]="!canSend"
+            class="inline-flex items-center justify-center gap-2 rounded-2xl bg-emerald-600 px-6 py-3 text-[15px] font-extrabold text-white hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer">
+            <lucide-icon name="send" class="h-4 w-4" />
+            {{ sending() ? 'Đang gửi…' : 'Gửi thư' }}
+          </button>
+        </div>
+      </form>
+    }
+  </section>
+</div>

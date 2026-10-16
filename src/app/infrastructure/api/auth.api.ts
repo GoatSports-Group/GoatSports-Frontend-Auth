@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { BaseResponse } from '@application/dto/base/base-response';
 import { User } from '@domain/entities/user';
-import { LoginRequest, RegisterRequest, VerificationRequest, ForgotPasswordRequest } from '@application/dto/auth/auth.dto';
+import { AccountAppealRequest, LoginRequest, RegisterRequest, VerificationRequest, ForgotPasswordRequest } from '@application/dto/auth/auth.dto';
 import { environment } from "@environments/environment";
 
 @Injectable({
@@ -38,6 +38,13 @@ export class AuthApi {
   forgotPassword(payload: ForgotPasswordRequest): Observable<BaseResponse<void>> {
     return this.http.put<BaseResponse<void>>(
       `${this.apiBase}/auth-service/api/v1/auth/forgot-password`,
+      payload
+    );
+  }
+
+  submitAccountAppeal(payload: AccountAppealRequest): Observable<BaseResponse<void>> {
+    return this.http.post<BaseResponse<void>>(
+      `${this.apiBase}/auth-service/api/v1/auth/account-appeals`,
       payload
     );
   }
