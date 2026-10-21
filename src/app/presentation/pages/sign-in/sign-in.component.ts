@@ -57,7 +57,8 @@ export class SignInComponent implements OnInit {
       this.accountStatus.set(blocked);
       void this.router.navigate([], {
         relativeTo: this.route, replaceUrl: true,
-        queryParams: { account: null, appealToken: null, email: null, fullName: null }, queryParamsHandling: 'merge'
+        queryParams: { account: null, appealToken: null, email: null, fullName: null, codeSent: null },
+        queryParamsHandling: 'merge'
       });
     }
 
@@ -181,9 +182,13 @@ export function accountStatusFrom(err: HttpErrorResponse): AccountStatusError | 
 }
 
 /** /login?account=blocked&appealToken=…&email=…&fullName=… do auth-service gửi về sau khi Google xác thực. */
+/** auth-service chuyển về đây sau đăng nhập Google: bị khóa (kèm mã khiếu nại) hoặc chưa xác thực (đã gửi OTP). */
 export function blockedStatusFromQuery(params: ParamMap): AccountStatusError | null {
   const appealToken = params.get('appealToken');
   const email = params.get('email');
+  if (params.get('account') === 'inactive' && email) {
+    return { code: 'ACCOUNT_INACTIVE', email, codeSent: params.get('codeSent') === 'true' };
+  }
   if (params.get('account') !== 'blocked' || !appealToken || !email) return null;
   return { code: 'ACCOUNT_BLOCKED', email, fullName: params.get('fullName') ?? undefined, appealToken, appealTtlMinutes: 30 };
 }

@@ -40,6 +40,12 @@ describe('blockedStatusFromQuery', () => {
     expect(blockedStatusFromQuery(convertToParamMap({ account: 'blocked', email: 'a@b.c' }))).toBeNull();
     expect(blockedStatusFromQuery(convertToParamMap({}))).toBeNull();
   });
+
+  it('mở popup nhập OTP khi Google chuyển về với tài khoản chưa xác thực', () => {
+    expect(blockedStatusFromQuery(convertToParamMap({ account: 'inactive', email: 'a@b.c', codeSent: 'true' })))
+      .toEqual({ code: 'ACCOUNT_INACTIVE', email: 'a@b.c', codeSent: true });
+    expect(blockedStatusFromQuery(convertToParamMap({ account: 'inactive' }))).toBeNull();
+  });
 });
 
 describe('AccountStatusDialogComponent', () => {
