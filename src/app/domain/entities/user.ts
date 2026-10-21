@@ -13,4 +13,6 @@ export type User = {
   };
   keycloakId?: string;
   authProvider?: string;
+  /** Chỉ có ở phản hồi đăng nhập: lần đăng nhập này vừa hủy yêu cầu xóa tài khoản đang chờ. */
+  accountRestored?: boolean;
 }

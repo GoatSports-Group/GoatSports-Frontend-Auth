@@ -89,7 +89,9 @@ export class SignInComponent implements OnInit {
         this.authService.login(payload).subscribe({
           next: (user) => {
             this.loading.set(false);
-            this.toastService.show(`Chào mừng ${user?.fullName || user?.username} đã quay trở lại!`, 'success');
+            this.toastService.show(user?.accountRestored
+              ? 'Đã hủy yêu cầu xóa tài khoản. Tài khoản của bạn hoạt động bình thường.'
+              : `Chào mừng ${user?.fullName || user?.username} đã quay trở lại!`, 'success');
 
             setTimeout(() => {
               window.location.href = this.resolvePostLoginDestination(user);
