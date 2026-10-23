@@ -15,6 +15,13 @@ describe('resolvePostLoginDestination', () => {
     }
   );
 
+  it('keeps an admin-app destination for staff, e.g. an owner claiming an invited venue', () => {
+    const claim = 'http://localhost:4300/admin/applications?claim=v1';
+    expect(resolvePostLoginDestination('VENUE_OWNER', claim, destinations)).toBe(claim);
+    expect(resolvePostLoginDestination('VENUE_OWNER', 'http://localhost:4300.evil.test/admin/x', destinations))
+      .toBe('http://localhost:4300/admin/dashboard');
+  });
+
   it('keeps the requested client route for a player', () => {
     expect(resolvePostLoginDestination('PLAYER', 'http://localhost:4200/venues', destinations))
       .toBe('http://localhost:4200/venues');

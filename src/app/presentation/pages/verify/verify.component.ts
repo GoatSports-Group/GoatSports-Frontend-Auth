@@ -92,7 +92,7 @@ export class VerifyComponent implements OnInit, OnDestroy {
         this.toastService.show('Tài khoản đã được xác thực thành công! Đang chuyển hướng đăng nhập...', 'success');
 
         setTimeout(() => {
-          this.router.navigate(['/login']);
+          this.navigateToSignIn();
         }, 1500);
       },
       error: (err: HttpErrorResponse) => {
@@ -160,7 +160,10 @@ export class VerifyComponent implements OnInit, OnDestroy {
   }
 
   navigateToSignIn() {
-    this.router.navigate(['/login']);
+    // Giữ ?redirect (vd chủ sân đến từ lời mời nhận quản lý sân) để đăng nhập xong quay về đúng nơi.
+    const redirect = this.route.snapshot.queryParamMap.get('redirect');
+    if (redirect) this.router.navigate(['/login'], { queryParams: { redirect } });
+    else this.router.navigate(['/login']);
   }
 
   navigateToHome() {

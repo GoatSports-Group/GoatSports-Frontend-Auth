@@ -171,8 +171,10 @@ export class SignUpComponent {
     this.successMessage.set(message);
     this.toast.show(message, 'success');
     timer(700).pipe(take(1), takeUntilDestroyed(this.destroyRef)).subscribe(() => {
+      // Giữ ?redirect (vd chủ sân đến từ lời mời nhận quản lý sân) qua bước xác thực và đăng nhập.
+      const redirect = this.route.snapshot.queryParamMap.get('redirect');
       void this.router.navigate(['/verify'], {
-        queryParams: { email }
+        queryParams: redirect ? { email, redirect } : { email }
       });
     });
   }

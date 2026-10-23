@@ -13,7 +13,10 @@ export function resolvePostLoginDestination(
 ): string {
   const role = (roleName || '').toUpperCase();
   if (role && role !== CLIENT_ROLE) {
-    return `${destinations.adminUrl.replace(/\/+$/, '')}/admin/dashboard`;
+    const adminBase = `${destinations.adminUrl.replace(/\/+$/, '')}/admin/`;
+    // Chỉ nhận đích nằm trong trang quản trị (vd chủ sân mở lời mời "nhận quản lý sân" -> /admin/applications?claim=…);
+    // đích của trang người chơi hay domain lạ thì về dashboard như cũ, không thành open redirect.
+    return requestedRedirect?.startsWith(adminBase) ? requestedRedirect : `${adminBase}dashboard`;
   }
 
   return requestedRedirect || destinations.clientUrl;
